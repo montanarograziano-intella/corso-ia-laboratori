@@ -1,0 +1,254 @@
+{
+ "nota": "DATI SINTETICI - USO DIDATTICO. Quindici domande sul fascicolo con risposta nota. Le risposte attese vengono dai documenti e dalla cronologia di riferimento.",
+ "strumenti": [
+  {
+   "name": "cerca_nel_fascicolo",
+   "description": "Cerca nei documenti del fascicolo e restituisce le righe pertinenti.",
+   "parameters": {
+    "type": "object",
+    "properties": {
+     "domanda": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "domanda"
+    ]
+   }
+  },
+  {
+   "name": "leggi_documento",
+   "description": "Legge un documento intero. Identificativi da DOC-01 a DOC-11.",
+   "parameters": {
+    "type": "object",
+    "properties": {
+     "id_documento": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "id_documento"
+    ]
+   }
+  },
+  {
+   "name": "leggi_movimenti",
+   "description": "Restituisce i movimenti del conto tra due date, estremi inclusi. Date nel formato GG/MM/AAAA.",
+   "parameters": {
+    "type": "object",
+    "properties": {
+     "data_iniziale": {
+      "type": "string"
+     },
+     "data_finale": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "data_iniziale",
+     "data_finale"
+    ]
+   }
+  }
+ ],
+ "domande": [
+  {
+   "id": "E1",
+   "tipo": "estrazione",
+   "titolo": "Importo del primo bonifico",
+   "documenti": [
+    "DOC-05"
+   ],
+   "domanda": "Qual è l'importo, in euro, del bonifico istantaneo del 3 marzo 2025? Rispondi con un oggetto JSON con il campo \"importo\" (numero, senza segno).",
+   "atteso": {
+    "importo": 4200
+   }
+  },
+  {
+   "id": "E2",
+   "tipo": "estrazione",
+   "titolo": "IBAN del secondo bonifico",
+   "documenti": [
+    "DOC-05"
+   ],
+   "domanda": "Qual è l'IBAN del destinatario del bonifico del 5 marzo 2025? Rispondi con un oggetto JSON con il campo \"iban\".",
+   "atteso": {
+    "iban": "IT87D9999999999000000123465"
+   }
+  },
+  {
+   "id": "E3",
+   "tipo": "estrazione",
+   "titolo": "Ora e durata della telefonata",
+   "documenti": [
+    "DOC-04"
+   ],
+   "domanda": "A che ora è arrivata la chiamata in entrata, e quanti minuti è durata? Rispondi con un oggetto JSON con i campi \"ora\" (HH:MM) e \"durata_minuti\" (numero).",
+   "atteso": {
+    "ora": "10:19",
+    "durata_minuti": 17
+   }
+  },
+  {
+   "id": "E4",
+   "tipo": "estrazione",
+   "titolo": "Indirizzo che apre il pannello",
+   "documenti": [
+    "DOC-07"
+   ],
+   "domanda": "Quale indirizzo IP richiede la pagina /admin/credenziali, e quante volte? Rispondi con un oggetto JSON con i campi \"ip\" e \"volte\" (numero).",
+   "atteso": {
+    "ip": "192.0.2.88",
+    "volte": 3
+   }
+  },
+  {
+   "id": "E5",
+   "tipo": "estrazione",
+   "titolo": "Mittente e data dell'email",
+   "documenti": [
+    "DOC-06"
+   ],
+   "domanda": "Da quale indirizzo email risulta inviato il messaggio, e in che data? Rispondi con un oggetto JSON con i campi \"mittente\" e \"data\" (AAAA-MM-GG).",
+   "atteso": {
+    "mittente": "assistenza@banca-esempio-sicurezza.invalid",
+    "data": "2025-03-02"
+   }
+  },
+  {
+   "id": "E6",
+   "tipo": "estrazione",
+   "titolo": "Un dato che non c'è",
+   "documenti": [
+    "DOC-01"
+   ],
+   "domanda": "A che ora è stato disposto il bonifico? Rispondi con un oggetto JSON con il campo \"ora_bonifico\" (HH:MM). Se il documento non lo dice, il valore è null.",
+   "atteso": {
+    "ora_bonifico": null
+   }
+  },
+  {
+   "id": "F1",
+   "tipo": "fascicolo",
+   "titolo": "Data e ora della denuncia",
+   "documenti": "tutti",
+   "domanda": "In che data e a che ora è stata verbalizzata la denuncia di Giulia Neri? Rispondi con un oggetto JSON con i campi \"data\" (AAAA-MM-GG) e \"ora\" (HH:MM).",
+   "atteso": {
+    "data": "2025-03-03",
+    "ora": "16:40"
+   }
+  },
+  {
+   "id": "F2",
+   "tipo": "fascicolo",
+   "titolo": "Due importi per lo stesso bonifico",
+   "documenti": "tutti",
+   "domanda": "Quale importo riferisce Anna Riva per il primo bonifico, e quale importo risulta dall'estratto conto? Rispondi con un oggetto JSON con i campi \"importo_riva\" e \"importo_estratto\" (numeri, senza segno).",
+   "atteso": {
+    "importo_riva": 2400,
+    "importo_estratto": 4200
+   }
+  },
+  {
+   "id": "F3",
+   "tipo": "fascicolo",
+   "titolo": "L'indirizzo che torna in due documenti",
+   "documenti": "tutti",
+   "domanda": "Quale indirizzo IP compare sia nel log del sito clone sia nella comunicazione della banca? Rispondi con un oggetto JSON con il campo \"ip\".",
+   "atteso": {
+    "ip": "192.0.2.88"
+   }
+  },
+  {
+   "id": "S1",
+   "tipo": "sintesi",
+   "titolo": "Riassunto della denuncia",
+   "documenti": [
+    "DOC-01"
+   ],
+   "domanda": "Riassumi la denuncia in tre frasi al massimo, in italiano. Riporta la data dei fatti e l'importo.",
+   "deve_contenere": [
+    "4[.\\s]?200",
+    "3 marzo|03/03",
+    "SMS|telefon|chiamat"
+   ],
+   "non_deve_contenere": [
+    "\\b(the|and|she|her)\\b"
+   ]
+  },
+  {
+   "id": "S2",
+   "tipo": "sintesi",
+   "titolo": "Riassunto del verbale di Anna Riva",
+   "documenti": [
+    "DOC-03"
+   ],
+   "domanda": "Riassumi il verbale in due frasi, in italiano. Riporta l'importo e la data dell'incontro in filiale.",
+   "deve_contenere": [
+    "2[.\\s]?400",
+    "4 marzo|04/03"
+   ],
+   "non_deve_contenere": [
+    "4[.\\s]?200",
+    "\\b(the|and|she|her)\\b"
+   ]
+  },
+  {
+   "id": "S3",
+   "tipo": "sintesi",
+   "titolo": "Riassunto in italiano di una chat in inglese",
+   "documenti": [
+    "DOC-08"
+   ],
+   "domanda": "Riassumi in italiano, in due frasi, che cosa concordano i due interlocutori della chat.",
+   "deve_contenere": [
+    "SMS|messaggio",
+    "banca",
+    "conto|denaro|soldi"
+   ],
+   "non_deve_contenere": [
+    "\\b(the|and|money|account)\\b"
+   ]
+  },
+  {
+   "id": "T1",
+   "tipo": "strumento",
+   "titolo": "Leggere un documento",
+   "documenti": [],
+   "domanda": "Leggi il documento DOC-07.",
+   "atteso": {
+    "strumento": "leggi_documento",
+    "argomenti": {
+     "id_documento": "DOC-07"
+    }
+   }
+  },
+  {
+   "id": "T2",
+   "tipo": "strumento",
+   "titolo": "Movimenti tra due date",
+   "documenti": [],
+   "domanda": "Quali movimenti ci sono stati sul conto tra il 3 e il 5 marzo 2025?",
+   "atteso": {
+    "strumento": "leggi_movimenti",
+    "argomenti": {
+     "data_iniziale": "03/03/2025",
+     "data_finale": "05/03/2025"
+    }
+   }
+  },
+  {
+   "id": "T3",
+   "tipo": "strumento",
+   "titolo": "Cercare una persona",
+   "documenti": [],
+   "domanda": "Cerca nel fascicolo chi è Carla Monti.",
+   "atteso": {
+    "strumento": "cerca_nel_fascicolo",
+    "argomenti_contengono": {
+     "domanda": "Monti"
+    }
+   }
+  }
+ ]
+}

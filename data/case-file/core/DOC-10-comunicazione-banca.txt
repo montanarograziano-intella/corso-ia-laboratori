@@ -1,0 +1,12 @@
+DATI SINTETICI - USO DIDATTICO
+DOC-10 · Comunicazione di Banca Esempio al Commissariato di P.S. di Borgovecchio
+7 marzo 2025 · Oggetto: conto intestato a Giulia Neri, riscontro alla richiesta del 6 marzo 2025
+
+Dal conto risultano due bonifici in uscita non riconosciuti dalla cliente.
+Il primo, del 3 marzo 2025, è un bonifico istantaneo di 4.200,00 euro, disposto dal dispositivo abituale della cliente. Non è revocabile; la richiesta di richiamo ha avuto esito negativo.
+Il secondo, del 5 marzo 2025, è un bonifico di 1.500,00 euro, disposto da un dispositivo associato al conto il 3 marzo 2025.
+L'accesso del 5 marzo proviene dall'indirizzo 192.0.2.88.
+Per il secondo bonifico è stata inviata richiesta di richiamo alla banca del beneficiario. L'esito non è ancora noto.
+Le credenziali della cliente sono state bloccate il 5 marzo 2025, nel pomeriggio.
+La pratica di disconoscimento è stata aperta dalla filiale di Borgovecchio il 4 marzo 2025.
+Orari di esecuzione e dati dei beneficiari saranno trasmessi su provvedimento dell'Autorità Giudiziaria.

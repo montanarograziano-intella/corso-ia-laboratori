@@ -1,0 +1,20 @@
+DATI SINTETICI - USO DIDATTICO
+DOC-07 · Log acquisiti: server di posta di posta-esempio.invalid (righe 5-13) e sito banca-esempio-accesso.invalid (righe 14-20)
+Acquisiti il 12 marzo 2025 dal gestore di posta e dal fornitore di hosting, su provvedimento dell'Autorità Giudiziaria del 10 marzo 2025. Indirizzi IP degli intervalli riservati alla documentazione. Il numero a inizio riga è il numero di riga del documento.
+
+5 2025-03-01T22:14:51+01:00 mx1 delivered from=<newsletter@negozio-esempio.invalid> to=<giulia.neri@posta-esempio.invalid>
+6 2025-03-02T07:02:10+01:00 mx1 delivered from=<avvisi@comune-esempio.invalid> to=<giulia.neri@posta-esempio.invalid>
+7 2025-03-02T07:40:33+01:00 mx1 rejected from=<promo@offerte-esempio.invalid> to=<giulia.neri@posta-esempio.invalid> reason=spam
+8 2025-03-02T07:58:02+01:00 mx1 delivered from=<paolo.neri@posta-esempio.invalid> to=<giulia.neri@posta-esempio.invalid>
+9 2025-03-02T08:03:47+01:00 mx1 connect from=srv12.host-esempio.invalid[203.0.113.45]
+10 2025-03-02T08:03:49+01:00 mx1 delivered from=<assistenza@banca-esempio-sicurezza.invalid> to=<carla.monti@posta-esempio.invalid> relay=srv12.host-esempio.invalid[203.0.113.45]
+11 2025-03-02T08:11:58+01:00 mx1 connect from=srv12.host-esempio.invalid[203.0.113.45]
+12 2025-03-02T08:12:04+01:00 mx1 delivered from=<assistenza@banca-esempio-sicurezza.invalid> to=<giulia.neri@posta-esempio.invalid> relay=srv12.host-esempio.invalid[203.0.113.45]
+13 2025-03-02T09:30:15+01:00 mx1 delivered from=<newsletter@negozio-esempio.invalid> to=<giulia.neri@posta-esempio.invalid>
+14 198.51.100.23 - - [02/Mar/2025:21:56:40 +0100] "GET /verifica HTTP/1.1" 200
+15 198.51.100.23 - - [02/Mar/2025:21:58:12 +0100] "POST /verifica HTTP/1.1" 302
+16 198.51.100.23 - - [02/Mar/2025:21:58:13 +0100] "GET /grazie HTTP/1.1" 200
+17 192.0.2.88 - - [02/Mar/2025:22:40:05 +0100] "GET /admin/credenziali HTTP/1.1" 200
+18 192.0.2.88 - - [03/Mar/2025:09:51:30 +0100] "GET /admin/credenziali HTTP/1.1" 200
+19 198.51.100.77 - - [03/Mar/2025:12:02:44 +0100] "GET /verifica HTTP/1.1" 200
+20 192.0.2.88 - - [05/Mar/2025:08:31:09 +0100] "GET /admin/credenziali HTTP/1.1" 200

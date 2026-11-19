@@ -1,0 +1,8 @@
+# DATI SINTETICI - USO DIDATTICO
+# DOC-05 · Movimenti del conto di Giulia Neri presso Banca Esempio, trascritti dalla cliente dall'app della banca, dal 28/02/2025 al 05/03/2025. Solo date, senza orari.
+data,descrizione,importo,iban_destinatario
+28/02/2025,Accredito stipendio,"1.850,00",
+01/03/2025,Pagamento con carta,"-64,30",
+03/03/2025,Bonifico istantaneo,"-4.200,00",IT87 D999 9999 9990 0000 0123 456
+04/03/2025,Addebito utenza,"-89,10",
+05/03/2025,Bonifico,"-1.500,00",IT87 D999 9999 9990 0000 0123 465

@@ -1,0 +1,21 @@
+# DATI SINTETICI - USO DIDATTICO
+n,data,ora,evento,importo,fonti
+1,2025-03-02,08:12,Email di phishing consegnata alla casella di Giulia Neri,,DOC-07 riga 12; DOC-06
+2,2025-03-02,21:58,Giulia Neri inserisce le credenziali sulla pagina clone,,DOC-07 riga 15; DOC-11
+3,2025-03-02,22:40,Accesso al pannello delle credenziali del sito clone da 192.0.2.88,,DOC-07 riga 17
+4,2025-03-02,23:08,Nella chat in inglese si concorda di chiamare la vittima e far spostare il denaro,,DOC-08
+5,2025-03-03,09:51,Nuovo accesso al pannello delle credenziali del sito clone da 192.0.2.88,,DOC-07 riga 18
+6,2025-03-03,10:12,SMS a nome della banca,,DOC-01 riga 6; DOC-04
+7,2025-03-03,10:19,Telefonata del falso operatore (17 minuti),,DOC-04; DOC-01 riga 7; DOC-02
+8,2025-03-03,10:27,"Codice di sicurezza ricevuto per SMS; letto al telefono secondo il marito, la denunciante non ricorda",,DOC-04; DOC-02; DOC-01 riga 10
+9,2025-03-03,10:41,Giulia Neri richiama il numero: chiamata non riuscita,,DOC-04 riga 11; DOC-01 riga 11
+10,2025-03-03,non indicata,Bonifico istantaneo disposto da Giulia Neri,4200.00,DOC-01 riga 9; DOC-05; DOC-02; DOC-10
+11,2025-03-03,16:40,Denuncia di Giulia Neri,,DOC-01
+12,2025-03-04,11:00,Giulia Neri in filiale; pratica di disconoscimento e richiesta di blocco delle credenziali,,DOC-03; DOC-10
+13,2025-03-05,08:31,Accesso al pannello delle credenziali da 192.0.2.88; la banca indica lo stesso indirizzo per l'accesso al conto del 5 marzo,,DOC-07 riga 20; DOC-10 riga 8
+14,2025-03-05,non indicata,Secondo bonifico da un dispositivo associato il 3 marzo; successivo alla denuncia e disconosciuto,1500.00,DOC-05; DOC-10; DOC-11
+15,2025-03-05,pomeriggio,Blocco delle credenziali eseguito,,DOC-10
+16,2025-03-06,09:30,Sommarie informazioni di Paolo Neri,,DOC-02
+17,2025-03-06,11:15,Sommarie informazioni di Anna Riva,,DOC-03
+18,2025-03-07,15:20,Acquisizione dell'email e dell'estratto dal telefono; proposta al PM per i log,,DOC-11; DOC-06 riga 3
+19,2025-03-12,non indicata,Acquisizione dei log e della chat su provvedimento dell'Autorità Giudiziaria del 10 marzo,,DOC-07 riga 3; DOC-08 riga 3

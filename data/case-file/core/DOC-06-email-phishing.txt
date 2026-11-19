@@ -1,0 +1,18 @@
+DATI SINTETICI - USO DIDATTICO
+DOC-06 · Email ricevuta da Giulia Neri, con intestazioni
+Acquisita dalla casella dell'interessata il 7 marzo 2025 (vedi DOC-11). Domini di fantasia.
+
+Received: from srv12.host-esempio.invalid [203.0.113.45] by mx1.posta-esempio.invalid; Sun, 2 Mar 2025 08:12:04 +0100
+Authentication-Results: mx1.posta-esempio.invalid; spf=none; dkim=none
+From: "Banca Esempio" <assistenza@banca-esempio-sicurezza.invalid>
+To: giulia.neri@posta-esempio.invalid
+Date: Sun, 2 Mar 2025 08:11:41 +0100
+Subject: Operazione sospetta: verifica entro 24 ore
+
+Gentile cliente,
+abbiamo rilevato un'operazione sospetta sul suo conto. Per motivi di sicurezza l'accesso sarà sospeso tra 24 ore.
+Per evitare la sospensione, confermi subito la sua identità.
+
+[Verifica ora] -> https://banca-esempio-accesso.invalid/verifica
+
+Banca Esempio, Servizio Sicurezza

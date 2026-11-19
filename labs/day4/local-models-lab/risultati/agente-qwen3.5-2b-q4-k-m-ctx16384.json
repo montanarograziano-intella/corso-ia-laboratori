@@ -1,0 +1,16 @@
+{
+ "modello": "qwen3.5:2b-q4_K_M",
+ "contesto": 16384,
+ "quando": "2026-11-17T12:07:57",
+ "macchina": "docenti",
+ "agente": {
+  "documenti_letti": 10,
+  "documenti": 10,
+  "email_inviata": false,
+  "eventi_trovati": null,
+  "eventi": null,
+  "passi": 14,
+  "nota": "ha risposto senza inviare l'email",
+  "secondi": 45
+ }
+}

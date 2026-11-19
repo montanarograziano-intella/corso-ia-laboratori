@@ -1,0 +1,16 @@
+{
+ "modello": "bonsai-2:4b",
+ "contesto": 16384,
+ "quando": "2026-11-17T12:07:11",
+ "macchina": "docenti",
+ "agente": {
+  "documenti_letti": 10,
+  "documenti": 10,
+  "email_inviata": true,
+  "eventi_trovati": 13,
+  "eventi": 19,
+  "passi": 17,
+  "nota": "",
+  "secondi": 103
+ }
+}
