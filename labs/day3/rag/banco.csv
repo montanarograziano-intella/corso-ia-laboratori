@@ -5,7 +5,7 @@ n,tipo,domanda,passi_attesi,nota
 4,identificativo,Che cosa è successo alle 22:40:05?,DOC-07:17,Il primo accesso al pannello delle credenziali del sito clone
 5,identificativo,Che cosa registra il sito alle 21:58:12?,DOC-07:15,L'invio delle credenziali (POST /verifica)
 6,identificativo,Quale codice contiene il messaggio delle 10:27?,DOC-04:7,Il codice per attivare l'app su un nuovo dispositivo
-7,parafrasi,Il coniuge era in casa durante la chiamata?,DOC-02:8,"Sì: «ero in cucina con lei». Il verbale dice «marito» e «telefonata», non «coniuge» e «chiamata»"
+7,parafrasi,Il coniuge era in casa durante la chiamata?,DOC-02:8,"Sì: «ero in cucina con lei». Il verbale dice «moglie» e «telefonata», non «coniuge» e «chiamata»"
 8,parafrasi,La signora aveva capito che la posta elettronica e la chiamata erano collegate?,DOC-11:7,No: non aveva collegato l'email alla telefonata del giorno dopo
 9,parafrasi,Con quale scusa è stata convinta a muovere i risparmi?,DOC-01:8|DOC-02:12|DOC-03:12,"Il conto era in pericolo, qualcuno stava entrando: «spostare il denaro su un conto sicuro». Nei documenti non c'è «scusa» né «risparmi»"
 10,parafrasi,"A che ora del giorno doveva essere spostato il denaro, secondo la chat?",DOC-08:7,Entro mezzogiorno. La chat è in inglese: «Move the money to the safe account by noon»
