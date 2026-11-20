@@ -1,0 +1,22 @@
+[project]
+name = "rag-notebook"
+version = "0.1.0"
+description = "Day 3 RAG notebook: keyword, vector and hybrid search on the fascicolo, and answers with sources"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "fastembed>=0.5",
+    "ipykernel>=6",  # il kernel del notebook, anche quando lo si apre da Visual Studio Code
+    "ipywidgets>=8",  # la barra di avanzamento dello scaricamento del modello
+    "jupyterlab>=4",
+    "numpy>=2",
+    "onnxruntime<1.24",  # le versioni successive non hanno wheel per i Mac Intel né per macOS prima del 14
+    "pydantic-ai-slim[openai,anthropic]>=2.68",
+    "rank-bm25>=0.2.2",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]

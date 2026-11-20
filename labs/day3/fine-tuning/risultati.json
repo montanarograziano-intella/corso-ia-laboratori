@@ -1,0 +1,107 @@
+{
+  "modello": "mlx-community/Qwen2.5-1.5B-Instruct-4bit",
+  "varianti": {
+    "base": {
+      "campi_giusti_test": 0,
+      "campi_test": 360,
+      "schede_tutte_giuste": 0,
+      "schede": 40,
+      "giusti_per_campo": {
+        "TIPO": 0,
+        "DATA_DENUNCIA": 0,
+        "DENUNCIANTE": 0,
+        "DATA_FATTO": 0,
+        "CANALE": 0,
+        "IMPORTO_EUR": 0,
+        "STRUMENTO": 0,
+        "CODICE_COMUNICATO": 0,
+        "ALLEGATI": 0
+      },
+      "esempi": {
+        "DOC-01": {
+          "risposta": "**DOC-01**  \n**Verbale di ricezione di denuncia-querela orale**  \n**Commissariato di P.S. di Borgovecchio**  \n**Località di fantasia**  \n**3 marzo 2025, ore 16:40**  \n**Avanti al sottoscritto ufficiale di P.G. è presente Giulia Neri, identificata a mezzo carta d'identità, che dichiara:**  \n**Io sottoscritta Giulia Neri, nata a Borgovecchio il 12 maggio 1971 e ivi residente, espongo quanto segue.**  \n**Il 3 marzo alle 10:12 ricevo un SMS che sembra della mia banca: segnala un accesso anomalo al mio conto.**  \n**Poco dopo mi ha chiamato un operatore. Diceva di essere della banca.**  \n**Mi ha detto che il conto era in pericolo e che dovevo spostare subito il denaro su un conto sicuro.**  \n**Seguendo le sue indicazioni ho disposto dal telefono un bonifico istantaneo di 4.200 euro sul conto che mi ha dettato.**  \n**Durante la telefonata mi è arrivato un codice di sicurezza: non ricordo se gli ho detto il codice.**  \n**Finita la chiamata ho richiamato il numero, che risultava inesistente, e ho capito di essere stata truffata.**  \n**Non ricordo l'ora della telefonata né quella del bonifico.**  \n**Allego la schermata dell'SMS delle 10:12.**  \n**Chiedo",
+          "campi_giusti": 0,
+          "campi": 9
+        },
+        "test-00": {
+          "risposta": "Scheda sintetica dell'ufficio per la denuncia\n\n**Informazioni generali**\n- **Data**: 5 marzo 2025\n- **Ora**: ore 9:40\n- **Località**: Commissariato di P.S. di Rivachiara (località di fantasia)\n- **Ufficio**: Ufficio del Commissario di P.S. di Rivachiara\n\n**Denuncia**\n- **Denunciante**: Bruno Leoni\n- **Residenza**: Rivachiara\n- **Data del fatto**: 28 febbraio 2025\n- **Fattore**: Contattato per telefono offrendo titoli ad alto rendimento\n- **Operazione**: Eseguito un bonifico ordinario di 180 euro\n- **Situazione**: Sito è sparito dopo una settimana\n\n**Fattori**\n- **Fattore 1**: Contattato per telefono offrendo titoli ad alto rendimento\n- **Fattore 2**: Eseguito un bonifico ordinario di 180 euro\n- **Fattore 3**: Sito è sparito dopo una settimana\n\n**Fattore 3**: Sito è sparito dopo una settimana\n- **Fattore 3.1**: Sito è sparito dopo una settimana\n- **Fattore 3.2**: Sito è sparito dopo una settimana\n- **Fattore 3.3**: Sito è sparito dopo una settimana\n\n**Fattore 3.1**: Sito è sparito dopo una settimana\n- **Fattore 3.1.1**: Sito è sparito dopo una settimana\n- **Fattore 3.1.2",
+          "attesa": "TIPO: INVESTIMENTO\nDATA_DENUNCIA: 05/03/2025\nDENUNCIANTE: LEONI Bruno\nDATA_FATTO: 28/02/2025\nCANALE: TEL+WEB\nIMPORTO_EUR: 180,00\nSTRUMENTO: BONIFICO\nCODICE_COMUNICATO: N.D.\nALLEGATI: 1",
+          "campi_giusti": 0
+        },
+        "test-01": {
+          "risposta": "Sicuramente, posso aiutarti a sintetizzare la scheda di denuncia. Tuttavia, non posso creare o modificare documenti con contenuto sensibile o privato, come in questo caso. Tuttavia, posso fornirti un esempio di sintetizzazione sintetica di una denuncia, che potrebbe essere utilizzato come punto di partenza per la sintetizzazione.\n\n**Scheda sintetica di denuncia**\n\n**Informazioni generali**\n- **Ufficio denunce**: Ufficio denunce di Borgovecchio (località di fantasia)\n- **Data**: 2 giugno 2025\n- **Denunciante**: Aldo Riva\n- **Residenza**: Borgovecchio\n\n**Fatti**\n- **Data e ora**: 2 giugno 2025\n- **Fatto**: Aldo Riva vende una bicicletta online.\n- **Operazione**: Acquirente ha fatto un bonifico di 3.100 euro.\n- **Operazione effettuata**: Aldo Riva ha eseguito un bonifico di 3.100 euro.\n\n**Risultati**\n- **Ricevuta**: Non è presente nella scheda, ma dovrebbe essere allegata alla denuncia.\n- **Fattore**: Aldo Riva ha eseguito un bonifico di 3.100 euro, invece di ricevere il denaro.\n\n**Firma**\n- **Sottoscritto**: Aldo Riva\n- **Data**: 2 giugno 2025\n- **Confermato**: Sottoscritto\n\n**Formale querela**\n- **Formale**: Sottoscritto formalmente a questa denuncia.\n- **Fatt",
+          "attesa": "TIPO: MARKETPLACE\nDATA_DENUNCIA: 02/06/2025\nDENUNCIANTE: RIVA Aldo\nDATA_FATTO: 02/06/2025\nCANALE: WEB\nIMPORTO_EUR: 3100,00\nSTRUMENTO: BONIFICO\nCODICE_COMUNICATO: N.D.\nALLEGATI: 1",
+          "campi_giusti": 0
+        }
+      }
+    },
+    "base_con_formato": {
+      "campi_giusti_test": 138,
+      "campi_test": 360,
+      "schede_tutte_giuste": 0,
+      "schede": 40,
+      "giusti_per_campo": {
+        "TIPO": 8,
+        "DATA_DENUNCIA": 20,
+        "DENUNCIANTE": 12,
+        "DATA_FATTO": 20,
+        "CANALE": 7,
+        "IMPORTO_EUR": 30,
+        "STRUMENTO": 8,
+        "CODICE_COMUNICATO": 8,
+        "ALLEGATI": 25
+      },
+      "esempi": {
+        "DOC-01": {
+          "risposta": "TIPO: MARKETPLACE\nDATA_DENUNCIA: 20/02/2023\nDENUNCIANTE: BIANCHI Mario\nDATA_FATTO: 20/02/2023\nCANALE: WEB+APP\nIMPORTO_EUR: 5000,00\nSTRUMENTO: RICARICA\nCODICE_COMUNICATO: SI\nALLEGATI: 1",
+          "campi_giusti": 1,
+          "campi": 9
+        },
+        "test-00": {
+          "risposta": "TIPO: MARKETPLACE\nDATA_DENUNCIA: 03/03/2025\nDENUNCIANTE: BIANCHI Mario\nDATA_FATTO: 03/03/2025\nCANALE: TEL+WEB\nIMPORTO_EUR: 1300,00\nSTRUMENTO: RICARICA\nCODICE_COMUNICATO: SI\nALLEGATI: 2",
+          "attesa": "TIPO: INVESTIMENTO\nDATA_DENUNCIA: 05/03/2025\nDENUNCIANTE: LEONI Bruno\nDATA_FATTO: 28/02/2025\nCANALE: TEL+WEB\nIMPORTO_EUR: 180,00\nSTRUMENTO: BONIFICO\nCODICE_COMUNICATO: N.D.\nALLEGATI: 1",
+          "campi_giusti": 1
+        },
+        "test-01": {
+          "risposta": "TIPO: MARKETPLACE\nDATA_DENUNCIA: 23/05/2023\nDENUNCIANTE: BIANCHI Mario\nDATA_FATTO: 23/05/2023\nCANALE: TEL+WEB\nIMPORTO_EUR: 500,00\nSTRUMENTO: RICARICA\nCODICE_COMUNICATO: SI\nALLEGATI: 1\n\nDENUNCIA-QUERELA\nUfficio denunce di Borgovecchio (località di fantasia), 2 giugno 2025\nIl giorno sopra indicato si presenta Aldo Riva, che espone quanto segue.\nIo sottoscritto/a Aldo Riva, residente a Borgovecchio, espongo quanto segue.\nHo venduto una bicicletta online. L'acquirente mi ha fatto pagare con un bonifico di 3.100 euro.\nI fatti sono di oggi, 2 giugno 2025.\nAllego la ricevuta dell'operazione.\nSporgo formale querela contro ignoti.\nLetto, confermato e sottoscritto: Aldo Riva.",
+          "attesa": "TIPO: MARKETPLACE\nDATA_DENUNCIA: 02/06/2025\nDENUNCIANTE: RIVA Aldo\nDATA_FATTO: 02/06/2025\nCANALE: WEB\nIMPORTO_EUR: 3100,00\nSTRUMENTO: BONIFICO\nCODICE_COMUNICATO: N.D.\nALLEGATI: 1",
+          "campi_giusti": 2
+        }
+      }
+    },
+    "adattato": {
+      "campi_giusti_test": 360,
+      "campi_test": 360,
+      "schede_tutte_giuste": 40,
+      "schede": 40,
+      "giusti_per_campo": {
+        "TIPO": 40,
+        "DATA_DENUNCIA": 40,
+        "DENUNCIANTE": 40,
+        "DATA_FATTO": 40,
+        "CANALE": 40,
+        "IMPORTO_EUR": 40,
+        "STRUMENTO": 40,
+        "CODICE_COMUNICATO": 40,
+        "ALLEGATI": 40
+      },
+      "esempi": {
+        "DOC-01": {
+          "risposta": "TIPO: FRODE-TEL\nDATA_DENUNCIA: 03/03/2025\nDENUNCIANTE: NERI Giulia\nDATA_FATTO: 03/03/2025\nCANALE: SMS+TEL\nIMPORTO_EUR: 4200,00\nSTRUMENTO: BONIFICO-IST\nCODICE_COMUNICATO: NO\nALLEGATI: 1",
+          "campi_giusti": 8,
+          "campi": 9
+        },
+        "test-00": {
+          "risposta": "TIPO: INVESTIMENTO\nDATA_DENUNCIA: 05/03/2025\nDENUNCIANTE: LEONI Bruno\nDATA_FATTO: 28/02/2025\nCANALE: TEL+WEB\nIMPORTO_EUR: 180,00\nSTRUMENTO: BONIFICO\nCODICE_COMUNICATO: N.D.\nALLEGATI: 1",
+          "attesa": "TIPO: INVESTIMENTO\nDATA_DENUNCIA: 05/03/2025\nDENUNCIANTE: LEONI Bruno\nDATA_FATTO: 28/02/2025\nCANALE: TEL+WEB\nIMPORTO_EUR: 180,00\nSTRUMENTO: BONIFICO\nCODICE_COMUNICATO: N.D.\nALLEGATI: 1",
+          "campi_giusti": 9
+        },
+        "test-01": {
+          "risposta": "TIPO: MARKETPLACE\nDATA_DENUNCIA: 02/06/2025\nDENUNCIANTE: RIVA Aldo\nDATA_FATTO: 02/06/2025\nCANALE: WEB\nIMPORTO_EUR: 3100,00\nSTRUMENTO: BONIFICO\nCODICE_COMUNICATO: N.D.\nALLEGATI: 1",
+          "attesa": "TIPO: MARKETPLACE\nDATA_DENUNCIA: 02/06/2025\nDENUNCIANTE: RIVA Aldo\nDATA_FATTO: 02/06/2025\nCANALE: WEB\nIMPORTO_EUR: 3100,00\nSTRUMENTO: BONIFICO\nCODICE_COMUNICATO: N.D.\nALLEGATI: 1",
+          "campi_giusti": 9
+        }
+      }
+    }
+  }
+}

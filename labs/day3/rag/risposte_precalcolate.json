@@ -1,0 +1,24 @@
+{
+  "modello": "ollama:qwen3.5-4b-16k",
+  "data": "2026-11-20",
+  "risposte": {
+    "1": {
+      "domanda": "Quale movimento ha come destinatario l'IBAN IT87 D999 9999 9990 0000 0123 465?",
+      "rag": "Il movimento con l'IBAN IT87 D999 9999 9990 0000 0123 465 è presente in [DOC-05, riga 8], che riporta un bonifico del 05/03/2025 per importo -1.500,00. Il passo [DOC-05, riga 6] cita un IBAN identico fino alla fine ma con estensione diversa (...456), quindi le fonti non coincidono completamente sulla corrispondenza richiesta."
+    },
+    "12": {
+      "domanda": "La banca è riuscita a recuperare la prima somma?",
+      "rag": "Il fascicolo non lo dice. Non esistono informazioni esplicithe sul recupero della prima somma; si parla solo del secondo bonifico, dove [DOC-54, riga 7] afferma che la richiesta di richiamo è stata accolta mentre [DOC-10, riga 9] dichiara l'esito non noto.",
+      "tutto": "Per la prima somma di 4.200 euro (3 marzo), il documento DOC-10 afferma che non è stato revocabile e la richiesta di richiamo ha avuto un esito negativo [DOC-10, riga 6]. Di conseguenza, il fascicolo non indica che la banca sia riuscita a recuperare l'importo."
+    },
+    "13": {
+      "domanda": "Quanto è stato trasferito con il primo bonifico?",
+      "rag": "Secondo il registro bancario [DOC-52, riga 6], il primo bonifico datato 17/02/2025 per un importo di -3.100,00 euro precede quello del 19/02/2025. Tuttavia le testimonie sono contraddittorie e non coincidono: la signora riferisce di [DOC-03, riga 14] aver trasferito 2.400 euro, mentre l'interlocutore cita un bonifico di [DOC-02, riga 16] per 4.200 euro.",
+      "tutto": "Nel caso di Giulia Neri, il primo bonifico ha importato 4.200 euro [DOC-01, riga 9], come confermato dai movimenti del conto [DOC-05, riga 6] e dalla banca [DOC-10, riga 6]. Nel caso distinto di Marta Bassi, il primo bonifico ha importato 3.100 euro [DOC-51, riga 9], confermati dai movimenti del conto [DOC-52, riga 6] e dalla banca [DOC-54, riga 6]."
+    },
+    "15": {
+      "domanda": "A che ora è stato eseguito il primo bonifico?",
+      "rag": "Il fascicolo non specifica l'ora esatta dell'esecuzione del primo bonifico. Sebbene la data sia indicata come il 17/02/2025 [DOC-52, riga 6], si afferma che tale dato orario è ignoto, poiché non è ricordato dal dichiarante [DOC-01, riga 13]."
+    }
+  }
+}

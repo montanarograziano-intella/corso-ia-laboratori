@@ -1,0 +1,9 @@
+DATI SINTETICI - USO DIDATTICO
+DOC-55 · Log acquisito: sito servizio-carte-modello.invalid
+Acquisito il 26 febbraio 2025 dal fornitore di hosting. Indirizzi IP degli intervalli riservati alla documentazione. Il numero a inizio riga è il numero della riga nel file originale.
+
+5 203.0.113.9 - - [16/Feb/2025:20:14:02 +0100] "GET /carta HTTP/1.1" 200
+6 203.0.113.9 - - [16/Feb/2025:20:15:40 +0100] "POST /carta HTTP/1.1" 302
+7 198.51.100.140 - - [16/Feb/2025:21:02:11 +0100] "GET /admin/dati HTTP/1.1" 200
+8 198.51.100.140 - - [17/Feb/2025:09:40:27 +0100] "GET /admin/dati HTTP/1.1" 200
+9 198.51.100.140 - - [19/Feb/2025:07:58:45 +0100] "GET /admin/dati HTTP/1.1" 200

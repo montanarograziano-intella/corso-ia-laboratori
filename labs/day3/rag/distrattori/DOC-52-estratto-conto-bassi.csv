@@ -1,0 +1,8 @@
+# DATI SINTETICI - USO DIDATTICO
+# DOC-52 · Movimenti del conto di Marta Bassi presso Cassa Campione, dal 13/02/2025 al 19/02/2025. Solo date, senza orari.
+data,descrizione,importo,iban_destinatario
+13/02/2025,Accredito stipendio,"1.640,00",
+15/02/2025,Pagamento con carta,"-37,80",
+17/02/2025,Bonifico istantaneo,"-3.100,00",IT38 O999 9999 9990 0000 0987 654
+18/02/2025,Addebito utenza,"-112,45",
+19/02/2025,Bonifico,"-1.150,00",IT11 J999 9999 9990 0000 0456 123
