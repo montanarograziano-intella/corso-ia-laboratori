@@ -12,7 +12,7 @@ Una riga per modello. I quattro numeri si leggono nell'ultima riga che stampa `b
 | `gemma3:4b` | | | | | | |
 
 Nella colonna Licenza, per i due modelli della parte 3: il nome, e una risposta (sì, no, con condizioni) a ciascuna
-delle tre domande della slide 52.
+delle tre domande della slide 53.
 Nella colonna Come agente, per i modelli provati nella parte 4: documenti letti, email inviata o no, eventi trovati.
 
 ## Il nostro esperimento (parte 2)

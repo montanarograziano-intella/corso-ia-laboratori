@@ -1,6 +1,6 @@
-# Un fine-tuning sul fascicolo: il prima e il dopo della slide 93
+# Un fine-tuning sul fascicolo: il prima e il dopo della slide 99
 
-Giorno 3, pomeriggio, slide 92-97. Un modello piccolo impara a compilare la scheda sintetica dell'ufficio a partire
+Giorno 3, pomeriggio, slide 97-102. Un modello piccolo impara a compilare la scheda sintetica dell'ufficio a partire
 da una denuncia. Il risultato è in `risultati.json`: è un fine-tuning eseguito davvero, non un esempio scritto a
 mano.
 
@@ -59,14 +59,14 @@ Il prompt della seconda riga descrive i nove campi, le sigle e le forme, e porta
 
 Che cosa dire in aula.
 
-- **Slide 93, il prima e il dopo.** Con la stessa istruzione di una riga, il modello di base ricopia la denuncia e
+- **Slide 99, il prima e il dopo.** Con la stessa istruzione di una riga, il modello di base ricopia la denuncia e
   quello adattato scrive la scheda. Le due risposte su DOC-01 sono in `risultati.json`, alle voci `base` e
   `adattato`.
-- **Slide 97, il confronto con un buon prompt.** Con il formato descritto il modello di base scrive nove righe
+- **Slide 102, il confronto con un buon prompt.** Con il formato descritto il modello di base scrive nove righe
   nella forma giusta, ma sbaglia il contenuto: su 40 denunce indovina l'importo 30 volte, il tipo di frode 8, i
   canali 7. Su DOC-01 copia la scheda di esempio, nome compreso («BIANCHI Mario»): un modello così piccolo confonde
   l'esempio con la risposta. Per questo compito, con questo modello, il prompt non basta.
-- **Slide 97, dove sbaglia il modello adattato.** Su DOC-01 sbaglia un campo: scrive `CODICE_COMUNICATO: NO`,
+- **Slide 102, dove sbaglia il modello adattato.** Su DOC-01 sbaglia un campo: scrive `CODICE_COMUNICATO: NO`,
   mentre la denuncia dice «non ricordo se gli ho detto il codice» e la scheda giusta è `N.D.`. Le 40 denunce mai
   viste usano le stesse frasi di quelle dell'addestramento: il 360 su 360 dice che ha imparato quelle frasi. Appena
   la frase cambia un poco, come in DOC-01, un campo cade. È il motivo per cui si prova su documenti scritti da altri

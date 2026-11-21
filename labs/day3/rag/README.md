@@ -1,6 +1,6 @@
 # Notebook RAG: vettoriale o ibrida?
 
-Giorno 3, pomeriggio, slide 128-129 (il banco di prova è presentato nella 127). 50 minuti, ognuno al proprio portatile.
+Giorno 3, pomeriggio, slide 132-133 (il banco di prova è presentato nella 131). 50 minuti, ognuno al proprio portatile.
 
 Si cerca nel fascicolo in tre modi (parole chiave, vettoriale, ibrida), si misura quale trova il passo giusto su
 quindici domande, poi un modello risponde citando le fonti. Tutti i dati sono sintetici.
@@ -85,7 +85,7 @@ la stessa: quando il passo giusto c'è, sta già tra i primi tre.
 | contraddizione | 2 | 1 | 1 | 2 |
 | totale | 14 | 8 | 7 | 10 |
 
-Che cosa si legge, per la slide 129:
+Che cosa si legge, per la slide 133:
 
 - La ricerca per parole chiave trova tutti gli identificativi e una sola parafrasi; la vettoriale trova quattro
   parafrasi su sei e due identificativi su sei. Nessuna delle due basta da sola.
@@ -104,7 +104,7 @@ La scheda con i tempi, ciò che deve comparire a ogni cella e le risposte attese
 non è nella copia dei partecipanti.
 
 - Il modello di embedding pesa 1 GB (senza PyTorch): conviene farlo scaricare la mattina, con l'ultima riga della
-  slide 4a. Il confronto è stato rifatto con altri quattro modelli multilingue, da 250 MB a 2,2 GB: con tutti la
+  slide 5. Il confronto è stato rifatto con altri quattro modelli multilingue, da 250 MB a 2,2 GB: con tutti la
   ricerca per parole trova gli identificativi e quasi nessuna parafrasi, la vettoriale il contrario, e nessuna
   domanda è trovata solo dall'ibrida. Con il modello da 250 MB l'ibrida non è la migliore nel totale (9 contro 10
   della vettoriale): per questo si usa quello da 1 GB.

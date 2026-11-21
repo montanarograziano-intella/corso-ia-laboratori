@@ -9,11 +9,12 @@ esistono. I domini finiscono in `.invalid` e gli indirizzi IP sono quelli riserv
 
 | Cartella | Giorno | Che cos'è |
 |---|---|---|
+| `labs/day3/visione/` | 3, mattina | Un notebook: cinque modelli di visione misurati su un piccolo test set |
 | `labs/day3/rag/` | 3, pomeriggio | Un notebook: tre modi di cercare nel fascicolo, e le risposte con la fonte |
 | `labs/day3/fine-tuning/` | 3, pomeriggio | Un esempio da leggere: un modello piccolo adattato a compilare una scheda |
 | `labs/day4/agent-lab/` | 4, mattina | Un agente che lavora su un fascicolo, con controlli e traccia |
 | `labs/day4/local-models-lab/` | 4, pomeriggio | Modelli piccoli sul proprio portatile, messi a confronto |
-| `data/case-file/` | 3, 4 e 5 | Il fascicolo: dieci documenti, più uno con un'istruzione nascosta |
+| `data/case-file/` | 3, 4 e 5 | Il fascicolo: dieci documenti, uno con un'istruzione nascosta, la foto di un IBAN |
 
 Ogni laboratorio ha il suo `README.md`, con i comandi da eseguire. Si parte da lì.
 

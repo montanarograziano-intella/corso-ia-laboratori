@@ -86,7 +86,7 @@ ollama show qwen3.5:4b-q4_K_M --license
 ollama show gemma3:4b --license
 ```
 
-Per i due modelli qui sopra, le tre domande della slide 52: possiamo usarlo per questo scopo, in questo luogo, e possiamo
+Per i due modelli qui sopra, le tre domande della slide 53: possiamo usarlo per questo scopo, in questo luogo, e possiamo
 modificarlo e ridistribuirlo? La risposta va cercata nel testo, non nel nome della licenza.
 
 ## Parte 4: l'agente del mattino, in locale (15 minuti)
@@ -123,4 +123,4 @@ leggere.
 ## Da consegnare
 
 La scheda compilata, con l'ultima riga: quale modello per quale compito, e che cosa costa. Le schede dei gruppi
-si mettono insieme sulla slide 69.
+si mettono insieme sulla slide 71.
