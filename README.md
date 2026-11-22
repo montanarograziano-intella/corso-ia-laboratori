@@ -28,6 +28,25 @@ cd <cartella clonata>/labs/day4/agent-lab
 uv sync
 ```
 
+## Prima del giorno 3
+
+I due notebook del giorno 3 scaricano circa 4,6 GB: vanno preparati prima, da una rete veloce. Servono 5 GB liberi e
+una mezz'ora. Dopo aver installato `uv` (su Windows: `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`;
+su macOS e Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`), chiudere e riaprire il terminale, poi:
+
+```sh
+cd <cartella clonata>/labs/day3/visione
+uv sync
+uv run python -c "import visione; visione.scarica_modelli()"
+cd ../rag
+uv sync
+uv run python -c "from rag import Indice; Indice()"
+```
+
+Su un Mac con processore Intel il notebook di `labs/day3/visione` non funziona: si prepara solo quello di `rag`.
+
+## Ricevere le novità
+
 Nei giorni successivi i docenti aggiungono materiale. Per riceverlo, dalla cartella clonata:
 
 ```sh
