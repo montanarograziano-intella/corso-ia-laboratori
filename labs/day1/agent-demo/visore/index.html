@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>L'agente sul fascicolo</title>
+    <style>
+    :root {
+      --ink: #14202b;
+      --muted: #5b6b7a;
+      --line: #d5dce3;
+      --bg: #f3f5f8;
+      --panel: #ffffff;
+      --agent: #1f5fd1;
+      --agent-soft: #e6eefc;
+      --ok: #1a7f4b;
+      --ok-soft: #e3f4ea;
+      --risk: #b3264a;
+      --risk-soft: #fbe6ec;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font:
+        18px / 1.45 system-ui,
+        -apple-system,
+        "Segoe UI",
+        sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px 24px;
+      background: var(--ink);
+      color: #fff;
+    }
+    header h1 {
+      font-size: 22px;
+      margin: 0;
+      font-weight: 650;
+    }
+    header .tabs {
+      display: flex;
+      gap: 8px;
+      margin-left: 12px;
+    }
+    header .tabs button {
+      border: 1px solid #54657a;
+      background: transparent;
+      color: #cfd8e3;
+      padding: 6px 14px;
+      border-radius: 999px;
+    }
+    header .tabs button[aria-pressed="true"] {
+      background: #fff;
+      color: var(--ink);
+      border-color: #fff;
+      font-weight: 600;
+    }
+    header .meta {
+      margin-left: auto;
+      font-size: 14px;
+      color: #a9b6c4;
+      text-align: right;
+    }
+    main {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr) 400px;
+      gap: 16px;
+      padding: 16px 24px;
+    }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    section > h2 {
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0;
+      padding: 14px 18px 10px;
+    }
+    .scroll {
+      overflow: auto;
+      padding: 0 18px 18px;
+      flex: 1;
+    }
+    /* the folder */
+    .doc {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      padding: 5px 12px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+    .doc b {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+    .doc span {
+      font-size: 15px;
+    }
+    .doc.letto {
+      color: var(--ink);
+      border-color: #9fb9ea;
+      background: var(--agent-soft);
+    }
+    .doc.ora {
+      color: #fff;
+      background: var(--agent);
+      border-color: var(--agent);
+    }
+    .doc.nuovo b::after {
+      content: " · nuovo in questa cartella";
+      letter-spacing: 0;
+      font-weight: 400;
+    }
+    /* what the agent is doing */
+    .richiesta {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      font-size: 16px;
+      white-space: pre-wrap;
+    }
+    .richiesta b {
+      display: block;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .passo {
+      display: flex;
+      gap: 12px;
+      padding: 9px 12px;
+      border-radius: 10px;
+    }
+    .passo .n {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--bg);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      font-variant-numeric: tabular-nums;
+    }
+    .passo.ora {
+      background: var(--agent-soft);
+    }
+    .passo.ora .n {
+      background: var(--agent);
+      color: #fff;
+    }
+    .passo.stop {
+      background: var(--risk-soft);
+    }
+    .passo.stop .n {
+      background: var(--risk);
+      color: #fff;
+    }
+    .passo.fatto {
+      background: var(--ok-soft);
+    }
+    .passo.fatto .n {
+      background: var(--ok);
+      color: #fff;
+    }
+    .passo small {
+      display: block;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .risposta {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 12px;
+    }
+    .risposta > b {
+      display: block;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    /* the log */
+    table.registro {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+      font-variant-numeric: tabular-nums;
+    }
+    table.registro td {
+      padding: 5px 6px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    table.registro td:first-child {
+      color: var(--muted);
+      width: 28px;
+    }
+    table.registro td:nth-child(2) {
+      color: var(--muted);
+      width: 74px;
+    }
+    table.registro tr.ora td {
+      background: var(--agent-soft);
+    }
+    table.registro tr.evidenza td {
+      background: #fff3c4;
+    }
+    /* rendered text: email and answer */
+    .testo h4 {
+      font-size: 17px;
+      margin: 14px 0 4px;
+    }
+    .testo p {
+      margin: 4px 0;
+    }
+    .testo ul {
+      margin: 4px 0;
+      padding-left: 22px;
+    }
+    .testo table {
+      border-collapse: collapse;
+      margin: 6px 0;
+      font-size: 16px;
+    }
+    .testo th,
+    .testo td {
+      border: 1px solid var(--line);
+      padding: 4px 8px;
+      text-align: left;
+    }
+    .testo th {
+      background: var(--bg);
+    }
+    /* overlays */
+    .velo {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 32, 43, 0.55);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .velo[hidden] {
+      display: none;
+    }
+    .scheda {
+      background: #fff;
+      border-radius: 14px;
+      width: min(1200px, 100%);
+      max-height: calc(100vh - 48px);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+    .scheda > h3 {
+      margin: 0;
+      padding: 18px 24px 6px;
+      font-size: 24px;
+    }
+    .scheda > p.sotto {
+      margin: 0;
+      padding: 0 24px 12px;
+      color: var(--muted);
+    }
+    .scheda .corpo {
+      overflow: auto;
+      padding: 0 24px 16px;
+      flex: 1;
+      min-height: 0;
+    }
+    .email {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 17px;
+    }
+    .campi,
+    .azioni {
+      flex: none;
+    }
+    .campi {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 6px 12px;
+      padding: 14px 24px;
+      border-top: 1px solid var(--line);
+      background: var(--bg);
+    }
+    .campi dt {
+      color: var(--muted);
+    }
+    .campi dd {
+      margin: 0;
+    }
+    .campi dd.dest {
+      font-size: 26px;
+      font-weight: 700;
+    }
+    .azioni {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px 20px;
+      border-top: 1px solid var(--line);
+    }
+    .azioni .stato {
+      margin-right: auto;
+      color: var(--muted);
+    }
+    .azioni button {
+      border: 2px solid var(--line);
+      background: #fff;
+      padding: 10px 26px;
+      border-radius: 10px;
+      font-weight: 650;
+      color: var(--muted);
+    }
+    .azioni button.scelto.approva {
+      background: var(--ok);
+      border-color: var(--ok);
+      color: #fff;
+    }
+    .azioni button.scelto.rifiuta {
+      background: var(--risk);
+      border-color: var(--risk);
+      color: #fff;
+    }
+    .righe {
+      font:
+        16px / 1.5 ui-monospace,
+        Menlo,
+        Consolas,
+        monospace;
+    }
+    .righe div {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 8px;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .righe div span:first-child {
+      color: var(--muted);
+      text-align: right;
+    }
+    .righe div.nascosta {
+      background: var(--risk);
+      color: #fff;
+    }
+    .righe div.nascosta span:first-child {
+      color: #fff;
+    }
+    .due {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .due h4 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+    .due iframe {
+      width: 100%;
+      height: 520px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    footer {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 24px 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    footer button {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 6px 16px;
+      color: var(--ink);
+    }
+    footer .sint {
+      margin-left: auto;
+      letter-spacing: 0.06em;
+    }
+    /* group mode: the group decides before seeing what the recorded person did */
+    .scelta-gruppo {
+      flex: none;
+      padding: 12px 24px;
+      border-top: 1px solid var(--line);
+      background: #fff8e1;
+    }
+    .scelta-gruppo b {
+      display: block;
+    }
+    .documenti-scheda {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px 24px;
+      border-top: 1px solid var(--line);
+    }
+    .documenti-scheda button {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 3px 12px;
+      font-size: 15px;
+    }
+    @media (max-width: 900px) {
+      body {
+        height: auto;
+        font-size: 16px;
+      }
+      header {
+        flex-wrap: wrap;
+        padding: 10px 14px;
+      }
+      header .tabs {
+        margin-left: 0;
+        flex-wrap: wrap;
+      }
+      header .meta {
+        margin-left: 0;
+        text-align: left;
+      }
+      main {
+        grid-template-columns: 1fr;
+        padding: 10px 12px;
+      }
+      section {
+        max-height: 70vh;
+      }
+      footer {
+        flex-wrap: wrap;
+        position: sticky;
+        bottom: 0;
+        background: var(--bg);
+        padding: 8px 12px;
+      }
+      footer .aiuto,
+      footer .sint {
+        display: none;
+      }
+      .velo {
+        padding: 8px;
+      }
+      /* on a phone the whole card scrolls, so the report is read at full length */
+      .scheda {
+        max-height: calc(100vh - 16px);
+        overflow: auto;
+      }
+      .scheda .corpo {
+        overflow: visible;
+        flex: none;
+      }
+      .campi {
+        grid-template-columns: 1fr;
+      }
+      .campi dd.dest {
+        font-size: 20px;
+      }
+      .due {
+        grid-template-columns: 1fr;
+      }
+    }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>L'agente sul fascicolo</h1>
+      <div class="tabs" id="tabs"></div>
+      <div class="meta" id="meta"></div>
+    </header>
+    <main>
+      <section>
+        <h2>La cartella</h2>
+        <div class="scroll" id="cartella"></div>
+      </section>
+      <section>
+        <h2>Che cosa fa l'agente</h2>
+        <div class="scroll" id="centro"></div>
+      </section>
+      <section>
+        <h2>Il registro</h2>
+        <div class="scroll" id="registro"></div>
+      </section>
+    </main>
+    <footer>
+      <button type="button" id="indietro">Indietro</button>
+      <button type="button" id="avanti">Avanti</button>
+      <span id="conta"></span>
+      <span class="aiuto" id="aiuto"
+        >Frecce o barra spaziatrice per muoversi · 1 e 2 per cambiare esecuzione · clic su un
+        documento per leggerlo</span
+      >
+      <span class="sint">DATI SINTETICI · USO DIDATTICO</span>
+    </footer>
+    <div class="velo" id="velo" hidden><div class="scheda" id="scheda"></div></div>
+    <script src="dati.js"></script>
+    <script>
+    // A replay of recorded runs: nothing here calls a model. Each run is a list of frames built from its trace.
+    const D = window.DATI;
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) =>
+      String(s).replace(
+        /[&<>"]/g,
+        (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]
+      );
+    const stato = { run: 0, frame: 0, doc: null };
+    // Group mode (?gruppo in the address): at each approval the group decides first; the recorded outcome
+    // stays hidden until it has chosen, so a group cannot copy what the person in the recording did.
+    const GRUPPO = new URLSearchParams(location.search).has('gruppo');
+    const scelte = {};
+
+    // Text written by the model: headings, lists, tables and bold, nothing else. Escaped first.
+    function testo(s) {
+      const righe = String(s).replace(/\\n/g, '\n').split('\n');
+      const out = [];
+      for (let i = 0; i < righe.length; i++) {
+        const r = righe[i].trim();
+        const b = (x) =>
+          esc(x)
+            .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+            .replace(/\*(.+?)\*/g, '<i>$1</i>');
+        if (!r) continue;
+        if (r.startsWith('|')) {
+          const tab = [];
+          while (i < righe.length && righe[i].trim().startsWith('|')) tab.push(righe[i++].trim());
+          i--;
+          const celle = tab
+            .filter((t) => !/^\|[\s:|-]+\|?$/.test(t))
+            .map((t) =>
+              t
+                .replace(/^\||\|$/g, '')
+                .split('|')
+                .map((c) => b(c.trim()))
+            );
+          out.push(
+            '<table>' +
+              celle
+                .map(
+                  (c, n) =>
+                    '<tr>' +
+                    c.map((x) => (n ? `<td>${x}</td>` : `<th>${x}</th>`)).join('') +
+                    '</tr>'
+                )
+                .join('') +
+              '</table>'
+          );
+        } else if (
+          /^#+\s/.test(r) ||
+          /^\*\*[^*]+\*\*:?$/.test(r) ||
+          /^\d+\.\s+[^.]{3,60}:?$/.test(r)
+        ) {
+          out.push(`<h4>${b(r.replace(/^#+\s/, '').replace(/^\*\*|\*\*:?$/g, ''))}</h4>`);
+        } else if (/^([-•*]|\d+[.)])\s/.test(r)) {
+          out.push(`<ul><li>${b(r.replace(/^([-•*]|\d+[.)])\s+/, ''))}</li></ul>`);
+        } else out.push(`<p>${b(r)}</p>`);
+      }
+      return out.join('').replace(/<\/ul><ul>/g, '');
+    }
+
+    function frasi(p) {
+      const a = p.argomenti || {};
+      if (p.tipo === 'richiesta')
+        return ['Riceve la richiesta', `${p.documenti.length} documenti nella cartella`];
+      if (p.tipo === 'approvazione')
+        return ['Si ferma e chiede a una persona', `Vuole inviare un'email a ${a.destinatario}`];
+      if (p.tipo === 'risposta') return ["Risponde all'operatore", ''];
+      if (p.strumento === 'elenca_documenti')
+        return ["Guarda che cosa c'è nella cartella", p.risultato];
+      if (p.strumento === 'leggi_documento') {
+        const d = D.documenti[a.id_documento];
+        return [`Apre ${a.id_documento}${d ? ' · ' + d.titolo : ''}`, p.risultato];
+      }
+      if (p.strumento === 'cerca_nel_fascicolo')
+        return [`Cerca nel fascicolo: «${a.domanda}»`, p.risultato];
+      if (p.strumento === 'invia_email')
+        return [
+          "Scrive l'email nella posta in uscita",
+          'In questa demo non parte nessuna email vera',
+        ];
+      return [p.strumento || p.tipo, p.risultato || ''];
+    }
+
+    // Frames: one per trace record; an approval takes two (asked, decided); the poisoned run ends on DOC-09.
+    function fotogrammi(e) {
+      const f = [];
+      e.passi.forEach((p, i) => {
+        f.push({ fino: i, mostra: p.tipo === 'approvazione' ? 'chiede' : null });
+        if (p.tipo === 'approvazione') f.push({ fino: i, mostra: 'deciso' });
+      });
+      if (e.avvelenata) f.push({ fino: e.passi.length - 1, mostra: 'doc09' });
+      return f;
+    }
+    const esecuzione = () => D.esecuzioni[stato.run];
+    const lista = () => fotogrammi(esecuzione());
+
+    function disegna() {
+      const e = esecuzione(),
+        fs = lista(),
+        f = fs[stato.frame],
+        visti = e.passi.slice(0, f.fino + 1),
+        ora = e.passi[f.fino];
+      $('tabs').innerHTML = D.esecuzioni
+        .map(
+          (x, i) =>
+            `<button data-run="${i}" aria-pressed="${i === stato.run}">${i + 1} · ${esc(x.nome)}</button>`
+        )
+        .join('');
+      $('meta').innerHTML = `Esecuzione registrata il ${esc(e.data)}<br>modello ${esc(e.modello)}`;
+      const letti = new Set(
+        visti.filter((p) => p.strumento === 'leggi_documento').map((p) => p.argomenti.id_documento)
+      );
+      const adesso = ora.strumento === 'leggi_documento' ? ora.argomenti.id_documento : null;
+      $('cartella').innerHTML = e.passi[0].documenti
+        .map((id) => {
+          const d = D.documenti[id],
+            c = id === adesso ? 'ora' : letti.has(id) ? 'letto' : '';
+          return `<button class="doc ${c} ${e.nuovi.includes(id) ? 'nuovo' : ''}" data-doc="${id}"><b>${id}</b><span>${esc(d.titolo)}</span></button>`;
+        })
+        .join('');
+      const passi = visti
+        .map((p, i) => {
+          const [t, s] = frasi(p),
+            ultimo = i === f.fino;
+          const inAttesa = p.tipo === 'approvazione' && ultimo && f.mostra === 'chiede';
+          const c =
+            p.tipo === 'approvazione' && !inAttesa
+              ? p.esito.startsWith('approvata')
+                ? 'fatto'
+                : 'stop'
+              : ultimo
+                ? 'ora'
+                : '';
+          const esito =
+            p.tipo === 'approvazione' && (!ultimo || f.mostra !== 'chiede') ? ` · ${p.esito}` : '';
+          return `<div class="passo ${c}"><div class="n">${p.passo}</div><div>${esc(t)}<small>${esc(s + esito)}</small></div></div>`;
+        })
+        .join('');
+      const fine =
+        ora.tipo === 'risposta'
+          ? `<div class="risposta"><b>Risposta dell'agente</b><div class="testo">${testo(ora.testo)}</div></div>`
+          : '';
+      $('centro').innerHTML =
+        `<div class="richiesta"><b>La richiesta</b>${esc(e.passi[0].testo)}</div>${passi}${fine}`;
+      $('centro').scrollTop = $('centro').scrollHeight;
+      $('registro').innerHTML = `<table class="registro">${visti
+        .map((p, i) => {
+          const evidenza =
+            f.mostra === 'doc09' &&
+            p.strumento === 'leggi_documento' &&
+            e.nuovi.includes(p.argomenti.id_documento);
+          const cosa =
+            p.tipo === 'strumento'
+              ? `${p.strumento}${p.argomenti.id_documento ? ' ' + p.argomenti.id_documento : ''}`
+              : p.tipo === 'approvazione'
+                ? `approvazione · ${i === f.fino && f.mostra === 'chiede' ? 'in attesa' : p.esito}`
+                : p.tipo;
+          return `<tr class="${evidenza ? 'evidenza' : i === f.fino ? 'ora' : ''}"><td>${p.passo}</td><td>${p.ora.slice(11)}</td><td>${esc(cosa)}</td></tr>`;
+        })
+        .join('')}</table>`;
+      $('registro').scrollTop = $('registro').scrollHeight;
+      $('conta').textContent = `${stato.frame + 1} di ${fs.length}`;
+      sovrapposto(f, ora, e);
+    }
+
+    function sovrapposto(f, ora, e) {
+      let html = '';
+      if (stato.doc) {
+        const d = D.documenti[stato.doc];
+        html = `<h3>${stato.doc} · ${esc(d.titolo)}</h3><p class="sotto">Il testo che lo strumento dà all'agente, riga per riga. Esc per chiudere.</p><div class="corpo">${righe(d)}</div>`;
+      } else if (f.mostra === 'chiede' || f.mostra === 'deciso') {
+        const a = ora.argomenti,
+          deciso = f.mostra === 'deciso',
+          si = ora.esito.startsWith('approvata');
+        html = `<h3>Richiesta di approvazione</h3><p class="sotto">L'agente vuole inviare questa email. Non parte finché una persona non decide.</p>
+            <div class="corpo"><div class="email testo">${testo(a.testo)}</div></div>
+            <dl class="campi"><dt>Oggetto</dt><dd>${esc(a.oggetto)}</dd><dt>Allegati</dt><dd>${a.allegati && a.allegati.length ? esc(a.allegati.join(', ')) : 'nessuno'}</dd><dt>Destinatario</dt><dd class="dest">${esc(a.destinatario)}</dd></dl>
+            <div class="documenti-scheda"><span>Controllate sui documenti:</span>${e.passi[0].documenti.map((id) => `<button data-doc="${id}">${id}</button>`).join('')}</div>
+            ${GRUPPO ? sceltaGruppo(deciso, si) : ''}
+            <div class="azioni"><span class="stato">${deciso ? 'Nella registrazione la persona ha deciso: ' + esc(ora.esito) : 'In attesa di una persona'}</span>
+            <button class="rifiuta ${GRUPPO ? (scelte[stato.run] === 'rifiuta' ? 'scelto' : '') : deciso && !si ? 'scelto' : ''}" data-scelta="rifiuta">Rifiuta</button><button class="approva ${GRUPPO ? (scelte[stato.run] === 'approva' ? 'scelto' : '') : deciso && si ? 'scelto' : ''}" data-scelta="approva">Approva</button></div>`;
+      } else if (f.mostra === 'doc09') {
+        const id = e.nuovi[0],
+          d = D.documenti[id];
+        html = `<h3>Che cosa c'era in ${id}</h3><p class="sotto">Lo stesso file, visto da una persona e letto dall'agente.</p>
+            <div class="corpo"><div class="due"><div><h4>Come lo vede una persona</h4><iframe sandbox srcdoc="${esc(d.html)}"></iframe></div>
+            <div><h4>Come lo ha letto l'agente</h4>${righe(d)}</div></div></div>`;
+      }
+      $('scheda').innerHTML = html;
+      $('velo').hidden = !html;
+    }
+    function sceltaGruppo(deciso, si) {
+      const s = scelte[stato.run];
+      if (!s)
+        return '<div class="scelta-gruppo"><b>Tocca a voi.</b>Leggete destinatario, allegati e testo, controllate la relazione sui documenti, poi scegliete Approva o Rifiuta, con un motivo.</div>';
+      if (!deciso)
+        return `<div class="scelta-gruppo"><b>Avete scelto: ${s === 'approva' ? 'approva' : 'rifiuta'}.</b>Scrivete il motivo sulla scheda, poi Avanti per vedere che cosa ha deciso la persona nella registrazione.</div>`;
+      const uguale = (s === 'approva') === si;
+      return `<div class="scelta-gruppo"><b>Voi: ${s === 'approva' ? 'approva' : 'rifiuta'} · la persona nella registrazione: ${si ? 'approva' : 'rifiuta'}.</b>${uguale ? 'Stessa decisione: con quale motivo?' : 'Decisioni diverse: chi ha visto che cosa?'}</div>`;
+    }
+    const righe = (d) =>
+      `<div class="righe">${d.righe.map((r, i) => `<div class="${d.nascoste.includes(i + 1) ? 'nascosta' : ''}"><span>${i + 1}</span><span>${esc(r)}</span></div>`).join('')}</div>`;
+
+    function vai(run, frame) {
+      stato.run = Math.max(0, Math.min(D.esecuzioni.length - 1, run));
+      stato.frame = Math.max(0, Math.min(lista().length - 1, frame));
+      stato.doc = null;
+      disegna();
+    }
+    const avanti = () => {
+      if (stato.doc) return chiudi();
+      const f = lista()[stato.frame];
+      if (GRUPPO && f.mostra === 'chiede' && !scelte[stato.run]) return;
+      vai(stato.run, stato.frame + 1);
+    };
+    const indietro = () => (stato.doc ? chiudi() : vai(stato.run, stato.frame - 1));
+    const chiudi = () => {
+      stato.doc = null;
+      disegna();
+    };
+    const apri = (id) => {
+      stato.doc = id;
+      disegna();
+    };
+    const scorri = (quota) => {
+      const c = document.querySelector('#scheda .corpo');
+      if (c) c.scrollTo({ top: (c.scrollHeight - c.clientHeight) * quota, behavior: 'smooth' });
+    };
+    window.visore = {
+      vai,
+      avanti,
+      indietro,
+      apri,
+      chiudi,
+      scorri,
+      stato,
+      fotogrammi: () =>
+        lista().map((f) => ({
+          ...f,
+          tipo: esecuzione().passi[f.fino].tipo,
+          strumento: esecuzione().passi[f.fino].strumento,
+          doc: (esecuzione().passi[f.fino].argomenti || {}).id_documento,
+        })),
+    };
+
+    $('avanti').onclick = avanti;
+    $('indietro').onclick = indietro;
+    document.addEventListener('click', (ev) => {
+      const t = ev.target.closest('[data-run],[data-doc]');
+      const sc = ev.target.closest('[data-scelta]');
+      if (GRUPPO && sc && lista()[stato.frame].mostra === 'chiede') {
+        scelte[stato.run] = sc.dataset.scelta;
+        return disegna();
+      }
+      if (t && t.dataset.run) vai(+t.dataset.run, 0);
+      else if (t && t.dataset.doc) apri(t.dataset.doc);
+      else if (ev.target === $('velo') && stato.doc) chiudi();
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (['ArrowRight', ' ', 'PageDown'].includes(ev.key)) {
+        ev.preventDefault();
+        avanti();
+      } else if (['ArrowLeft', 'PageUp'].includes(ev.key)) {
+        ev.preventDefault();
+        indietro();
+      } else if (ev.key === 'Escape' && stato.doc) chiudi();
+      else if (/^[1-9]$/.test(ev.key) && +ev.key <= D.esecuzioni.length) vai(+ev.key - 1, 0);
+    });
+    if (GRUPPO) {
+      $('aiuto').textContent =
+        'Avanti e Indietro per muoversi · alla richiesta di approvazione decidete voi · clic su un documento per leggerlo';
+      document.title += ' · gruppi';
+    }
+    disegna();
+    </script>
+  </body>
+</html>
