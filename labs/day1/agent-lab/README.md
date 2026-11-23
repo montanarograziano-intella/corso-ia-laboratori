@@ -27,8 +27,10 @@ Tutti i documenti sono sintetici, preparati per il corso.
 1. Nella pagina scegliete la vostra cartella. Copiate il prompt e incollatelo in una chat nuova.
 2. Il modello risponde con una richiesta: ELENCA, oppure LEGGI DOC-xx. Lo strumento tocca il pulsante giusto, chi
    scrive incolla il risultato. Si ripete finché il modello non ha letto quello che gli serve.
-3. Alla fine il modello scrive la relazione e una richiesta INVIA_EMAIL. Fermatevi: decide chi approva, dopo la
-   verifica. La decisione si incolla con il pulsante «approvata» o «rifiutata».
+3. Alla fine il modello scrive la relazione e una richiesta INVIA_EMAIL. Può arrivare anche senza la parola
+   INVIA_EMAIL, come un blocco che comincia con A:, Oggetto:, Allegati: e poi il testo: è la stessa richiesta.
+   Fermatevi: decide chi approva, dopo la verifica. La decisione si incolla con il pulsante «approvata» o
+   «rifiutata».
 
 ## La verifica
 
