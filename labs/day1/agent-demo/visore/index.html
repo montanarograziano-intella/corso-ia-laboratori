@@ -612,7 +612,7 @@
         return ["Guarda che cosa c'è nella cartella", p.risultato];
       if (p.strumento === 'leggi_documento') {
         const d = D.documenti[a.id_documento];
-        return [`Apre ${a.id_documento}${d ? ' · ' + d.titolo : ''}`, p.risultato];
+        return [`Apre ${a.id_documento}${d ? ` · ${d.titolo}` : ''}`, p.risultato];
       }
       if (p.strumento === 'cerca_nel_fascicolo')
         return [`Cerca nel fascicolo: «${a.domanda}»`, p.risultato];
@@ -694,7 +694,7 @@
             e.nuovi.includes(p.argomenti.id_documento);
           const cosa =
             p.tipo === 'strumento'
-              ? `${p.strumento}${p.argomenti.id_documento ? ' ' + p.argomenti.id_documento : ''}`
+              ? `${p.strumento}${p.argomenti.id_documento ? ` ${p.argomenti.id_documento}` : ''}`
               : p.tipo === 'approvazione'
                 ? `approvazione · ${i === f.fino && f.mostra === 'chiede' ? 'in attesa' : p.esito}`
                 : p.tipo;
@@ -717,10 +717,10 @@
           si = ora.esito.startsWith('approvata');
         html = `<h3>Richiesta di approvazione</h3><p class="sotto">L'agente vuole inviare questa email. Non parte finché una persona non decide.</p>
             <div class="corpo"><div class="email testo">${testo(a.testo)}</div></div>
-            <dl class="campi"><dt>Oggetto</dt><dd>${esc(a.oggetto)}</dd><dt>Allegati</dt><dd>${a.allegati && a.allegati.length ? esc(a.allegati.join(', ')) : 'nessuno'}</dd><dt>Destinatario</dt><dd class="dest">${esc(a.destinatario)}</dd></dl>
+            <dl class="campi"><dt>Oggetto</dt><dd>${esc(a.oggetto)}</dd><dt>Allegati</dt><dd>${a.allegati?.length ? esc(a.allegati.join(', ')) : 'nessuno'}</dd><dt>Destinatario</dt><dd class="dest">${esc(a.destinatario)}</dd></dl>
             <div class="documenti-scheda"><span>Controllate sui documenti:</span>${e.passi[0].documenti.map((id) => `<button data-doc="${id}">${id}</button>`).join('')}</div>
             ${GRUPPO ? sceltaGruppo(deciso, si) : ''}
-            <div class="azioni"><span class="stato">${deciso ? 'Nella registrazione la persona ha deciso: ' + esc(ora.esito) : 'In attesa di una persona'}</span>
+            <div class="azioni"><span class="stato">${deciso ? `Nella registrazione la persona ha deciso: ${esc(ora.esito)}` : 'In attesa di una persona'}</span>
             <button class="rifiuta ${GRUPPO ? (scelte[stato.run] === 'rifiuta' ? 'scelto' : '') : deciso && !si ? 'scelto' : ''}" data-scelta="rifiuta">Rifiuta</button><button class="approva ${GRUPPO ? (scelte[stato.run] === 'approva' ? 'scelto' : '') : deciso && si ? 'scelto' : ''}" data-scelta="approva">Approva</button></div>`;
       } else if (f.mostra === 'doc09') {
         const id = e.nuovi[0],
@@ -782,7 +782,7 @@
           ...f,
           tipo: esecuzione().passi[f.fino].tipo,
           strumento: esecuzione().passi[f.fino].strumento,
-          doc: (esecuzione().passi[f.fino].argomenti || {}).id_documento,
+          doc: esecuzione().passi[f.fino].argomenti?.id_documento,
         })),
     };
 
@@ -795,8 +795,8 @@
         scelte[stato.run] = sc.dataset.scelta;
         return disegna();
       }
-      if (t && t.dataset.run) vai(+t.dataset.run, 0);
-      else if (t && t.dataset.doc) apri(t.dataset.doc);
+      if (t?.dataset.run) vai(+t.dataset.run, 0);
+      else if (t?.dataset.doc) apri(t.dataset.doc);
       else if (ev.target === $('velo') && stato.doc) chiudi();
     });
     document.addEventListener('keydown', (ev) => {

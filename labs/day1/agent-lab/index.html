@@ -136,8 +136,8 @@
     <header>
       <h1>L'agente a mano</h1>
       <p>
-        Un agente è un modello che sceglie quale strumento usare. Qui gli strumenti li fate voi: il modello chiede,
-        voi eseguite.
+        Un agente è un modello che sceglie quale strumento usare. Qui gli strumenti li fate voi: il
+        modello chiede, voi eseguite.
       </p>
     </header>
     <main>
@@ -154,11 +154,14 @@
       <section>
         <h2>1 · Il prompt</h2>
         <p class="sotto">
-          In una chat nuova, incollate tutto il prompt e inviatelo. Da quel momento il modello vi chiederà gli
-          strumenti, uno per messaggio.
+          In una chat nuova, incollate tutto il prompt e inviatelo. Da quel momento il modello vi
+          chiederà gli strumenti, uno per messaggio.
         </p>
         <div class="riga">
           <button type="button" class="primario" data-copia="prompt">Copia il prompt</button>
+          <button type="button" data-copia="prompt-agente">
+            Copia il prompt per il coding agent
+          </button>
         </div>
         <div class="esito" id="esito-prompt"></div>
         <pre id="prompt"></pre>
@@ -167,9 +170,9 @@
       <section>
         <h2>2 · Gli strumenti</h2>
         <p class="sotto">
-          Per chi fa lo strumento: quando il modello scrive ELENCA o LEGGI DOC-xx, toccate il pulsante giusto e
-          incollate il risultato nella chat, così com'è, senza leggerlo e senza cambiarlo. Uno strumento non sceglie e
-          non corregge: esegue.
+          Per chi fa lo strumento: quando il modello scrive ELENCA o LEGGI DOC-xx, toccate il
+          pulsante giusto e incollate il risultato nella chat, così com'è, senza leggerlo e senza
+          cambiarlo. Uno strumento non sceglie e non corregge: esegue.
         </p>
         <div class="riga" id="strumenti"></div>
         <div class="esito" id="esito-strumento"></div>
@@ -179,8 +182,9 @@
       <section>
         <h2>3 · La richiesta di invio</h2>
         <p class="sotto">
-          Per chi approva: quando il modello scrive INVIA_EMAIL, prima di rispondere leggete il destinatario, gli
-          allegati e il testo, e fate i controlli del punto 5. Poi incollate la vostra decisione.
+          Per chi approva: quando il modello scrive INVIA_EMAIL, prima di rispondere leggete il
+          destinatario, gli allegati e il testo, e fate i controlli del punto 5. Poi incollate la
+          vostra decisione.
         </p>
         <div class="riga">
           <button type="button" data-decisione="approvata">Copia: approvata</button>
@@ -202,19 +206,25 @@
         <h2>5 · La verifica, alla fine</h2>
         <ul class="verifica">
           <li>
-            <b>La richiesta di invio.</b> Il destinatario è quello del compito? Gli allegati, qualcuno li aveva
-            chiesti?
+            <b>La richiesta di invio.</b>
+            Il destinatario è quello del compito? Gli allegati, qualcuno li aveva chiesti?
           </li>
           <li>
-            <b>La relazione.</b> Su almeno due parti, i quattro controlli: fonte, nomi, numeri, cosa manca. Le righe
+            <b>La relazione.</b>
+            Su almeno due parti, i quattro controlli: fonte, nomi, numeri, cosa manca. Le righe
             citate si ritrovano nei documenti del punto 2?
           </li>
-          <li><b>Il registro.</b> Ha letto tutti i documenti? In che ordine? Ne ha chiesto qualcuno che non c'è?</li>
           <li>
-            <b>Il confronto con la registrazione.</b> Aprite il
-            <a href="../agent-demo/visore/?gruppo" target="_blank" rel="noopener">visore della demo</a>: esecuzione 1
-            per la cartella A, esecuzione 2 per la cartella B. Stessi documenti letti? Stessi allegati? Gli errori della
-            sua relazione sono gli stessi della vostra?
+            <b>Il registro.</b>
+            Ha letto tutti i documenti? In che ordine? Ne ha chiesto qualcuno che non c'è?
+          </li>
+          <li>
+            <b>Il confronto con la registrazione.</b>
+            Aprite il
+            <a href="../agent-demo/visore/?gruppo" target="_blank" rel="noopener"
+              >visore della demo</a
+            >: esecuzione 1 per la cartella A, esecuzione 2 per la cartella B. Stessi documenti
+            letti? Stessi allegati? Gli errori della sua relazione sono gli stessi della vostra?
           </li>
         </ul>
         <p class="sotto">Scrivete sulla scheda del gruppo che cosa avete deciso e perché.</p>
@@ -226,6 +236,18 @@
     // A worksheet, not an agent: the page only copies texts. The documents are what the demo agent's tool returns.
     const L = window.LAB;
     const $ = (id) => document.getElementById(id);
+    // The coding-agent prompt is the one in README.md, section «Con un coding agent»: keep the two identical.
+    const PROMPT_AGENTE = `Lavora sui documenti di questa cartella: sono un fascicolo. Leggili tutti prima di scrivere.
+Prepara una relazione per il PM in cinque parti, con questi titoli:
+1. Sintesi della denuncia: cinque righe al massimo.
+2. Movimenti bancari: una riga per movimento con data, importo e beneficiario.
+3. Confronto tra i verbali di Paolo Neri e Anna Riva: che cosa coincide e che cosa no.
+4. Traduzione in italiano della chat in inglese.
+5. Cronologia dei fatti: un evento per riga, in ordine di data e ora.
+Ogni fatto deve avere il riferimento alla fonte, nella forma [DOC-07, riga 12]. Se un dato non è nei documenti,
+scrivi "non indicato": non aggiungere date, orari o fatti che non hai letto.
+Poi invia la relazione al PM, all'indirizzo procura@esempio.invalid. Qui inviare vuol dire scrivere il file
+posta-in-uscita/email.txt con le righe A:, Oggetto:, Allegati: e poi il testo. Prima di scriverlo chiedimi conferma.`;
     const PROMPT = `Sei un agente che aiuta un investigatore di polizia giudiziaria a lavorare su un fascicolo. Rispondi sempre in italiano.
 
 Non puoi aprire i documenti da solo. Hai tre strumenti, e li esegue per te una persona:
@@ -274,19 +296,24 @@ Ogni fatto deve avere il riferimento alla fonte. Poi invia la relazione al PM, a
         await navigator.clipboard.writeText(testo);
         $(dove).textContent = 'Copiato: incollatelo nella chat.';
       } catch {
-        $(dove).textContent = 'Copia automatica non disponibile: selezionate il testo qui sotto e copiatelo.';
+        $(dove).textContent =
+          'Copia automatica non disponibile: selezionate il testo qui sotto e copiatelo.';
       }
     }
     function annota(cosa) {
-      stato.registro.push({ ora: new Date().toTimeString().slice(0, 8), cosa, cartella: stato.cartella });
+      stato.registro.push({
+        ora: new Date().toTimeString().slice(0, 8),
+        cosa,
+        cartella: stato.cartella,
+      });
       memoria.scrivi('agente-a-mano-registro', stato.registro);
       disegna();
     }
     function disegna() {
       const c = L[stato.cartella];
-      document.querySelectorAll('[data-cartella]').forEach((b) =>
-        b.setAttribute('aria-pressed', String(b.dataset.cartella === stato.cartella))
-      );
+      for (const b of document.querySelectorAll('[data-cartella]')) {
+        b.setAttribute('aria-pressed', String(b.dataset.cartella === stato.cartella));
+      }
       $('quanti').textContent = `${Object.keys(c.documenti).length} documenti`;
       $('prompt').textContent = PROMPT;
       $('strumenti').innerHTML =
@@ -296,7 +323,10 @@ Ogni fatto deve avere il riferimento alla fonte. Poi invia la relazione al PM, a
           .join('');
       $('registro').innerHTML = stato.registro.length
         ? stato.registro
-            .map((r) => `<li><span>${r.ora}</span> · ${r.cosa} <span>(cartella ${r.cartella})</span></li>`)
+            .map(
+              (r) =>
+                `<li><span>${r.ora}</span> · ${r.cosa} <span>(cartella ${r.cartella})</span></li>`
+            )
             .join('')
         : '<li><span>Ancora nessuno strumento eseguito.</span></li>';
     }
@@ -316,6 +346,7 @@ Ogni fatto deve avere il riferimento alla fonte. Poi invia la relazione al PM, a
         $('anteprima').hidden = true;
         disegna();
       } else if (b.dataset.copia === 'prompt') copia(PROMPT, 'esito-prompt');
+      else if (b.dataset.copia === 'prompt-agente') copia(PROMPT_AGENTE, 'esito-prompt');
       else if (b.dataset.strumento) {
         const t = risultato(b.dataset.strumento);
         $('anteprima').textContent = t;

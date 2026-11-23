@@ -294,16 +294,15 @@
       const atteso = d.atteso
         ? JSON.stringify(d.atteso)
         : `deve contenere: ${d.deve_contenere.join(' · ')}`;
-      const risposta =
-        e.chiamate && e.chiamate.length
-          ? JSON.stringify(
-              e.chiamate.map((x) => x.function),
-              null,
-              1
-            )
-          : e.testo || '(nessuna risposta)';
+      const risposta = e.chiamate?.length
+        ? JSON.stringify(
+            e.chiamate.map((x) => x.function),
+            null,
+            1
+          )
+        : e.testo || '(nessuna risposta)';
       return `<h2>${esc(nome(c))} · ${d.id} ${esc(d.titolo)}</h2><dl>
-          <dt>Esito</dt><dd class="esito" style="color:${e.ok ? 'var(--ok)' : 'var(--ko)'}">${e.ok ? 'corretta' : 'sbagliata'}${e.motivo ? ' · ' + esc(e.motivo) : ''}</dd>
+          <dt>Esito</dt><dd class="esito" style="color:${e.ok ? 'var(--ok)' : 'var(--ko)'}">${e.ok ? 'corretta' : 'sbagliata'}${e.motivo ? ` · ${esc(e.motivo)}` : ''}</dd>
           <dt>Domanda</dt><dd>${esc(d.domanda)}</dd><dt>Risposta attesa</dt><dd>${esc(atteso)}</dd><dt>Risposta del modello</dt><dd>${esc(risposta)}</dd>
           <dt>Misure</dt><dd>primo token ${e.primo_token_s ?? 'n.d.'} s · ${e.token_al_secondo ?? 'n.d.'} token/s · ${e.token ?? 0} token · ${e.secondi ?? 'n.d.'} s</dd></dl>`;
     }
