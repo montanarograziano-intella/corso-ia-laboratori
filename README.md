@@ -9,6 +9,7 @@ esistono. I domini finiscono in `.invalid` e gli indirizzi IP sono quelli riserv
 
 | Cartella | Giorno | Che cos'è |
 |---|---|---|
+| `labs/day1/document-lab/` | 1, pomeriggio | Il laboratorio documentale: i quattro compiti, la scheda del gruppo, i documenti numerati |
 | `labs/day1/agent-lab/` | 1, pomeriggio | L'agente a mano: voi fate gli strumenti, il modello chiede; si apre `index.html` |
 | `labs/day1/agent-demo/visore/` | 1, pomeriggio | La demo dell'agente, da sfogliare nel browser: si apre `index.html` |
 | `labs/day3/visione/` | 3, mattina | Un notebook: cinque modelli di visione misurati su un piccolo test set |
