@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from rag import DISTRATTORI, FASCICOLO, parole, chunk_del_corpus, trovato
-from risposte import leggi_env, prompt
+from rag import DISTRATTORI, FASCICOLO, estrai_parole_significative, chunk_del_corpus, trovato
+from risposte import leggi_env, costruisci_prompt
 
 
 def test_un_chunk_tra_alternative() -> None:
@@ -22,9 +22,9 @@ def test_la_contraddizione_chiede_tutte_e_due_le_versioni() -> None:
 
 
 def test_orari_e_indirizzi_restano_interi() -> None:
-    assert "08:03:49" in parole("2025-03-02T08:03:49+01:00 mx1 delivered")
-    assert "192.0.2.88" in parole("L'accesso proviene dall'indirizzo 192.0.2.88.")
-    assert "che" not in parole("Che cosa registra il sito?")
+    assert "08:03:49" in estrai_parole_significative("2025-03-02T08:03:49+01:00 mx1 delivered")
+    assert "192.0.2.88" in estrai_parole_significative("L'accesso proviene dall'indirizzo 192.0.2.88.")
+    assert "che" not in estrai_parole_significative("Che cosa registra il sito?")
 
 
 def test_il_corpus_ha_i_chunk_attesi() -> None:
@@ -47,7 +47,7 @@ def test_ogni_chunk_atteso_del_banco_esiste() -> None:
 
 
 def test_il_prompt_porta_le_fonti_nella_forma_da_citare() -> None:
-    testo = prompt("Domanda di prova?", [("DOC-05:8", "05/03/2025,Bonifico")])
+    testo = costruisci_prompt("Domanda di prova?", [("DOC-05:8", "05/03/2025,Bonifico")])
     assert "[DOC-05, riga 8] 05/03/2025,Bonifico" in testo and testo.endswith("Domanda: Domanda di prova?")
 
 

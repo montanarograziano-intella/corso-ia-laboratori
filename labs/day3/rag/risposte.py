@@ -38,10 +38,26 @@ def leggi_env(file: Path = QUI / ".env") -> None:
             os.environ[nome.strip()] = valore.strip().strip("\"'")
 
 
-def prompt(domanda: str, chunk: list[tuple[str, str]]) -> str:
-    """Il testo mandato al modello: le istruzioni, i chunk con il loro riferimento, la domanda."""
-    righe = [f"[{riferimento.replace(':', ', riga ')}] {testo}" for riferimento, testo in chunk]
-    return f"{ISTRUZIONI}\n\nPassi:\n" + "\n".join(righe) + f"\n\nDomanda: {domanda}"
+def costruisci_prompt(domanda: str, chunk: list[tuple[str, str]]) -> str:
+    """Il testo che il modello riceve, in tre blocchi separati da una riga vuota.
+
+    1. Le istruzioni (ISTRUZIONI, qui sopra): usare solo i chunk, citare la fonte, dire quando il fascicolo non basta.
+    2. I chunk trovati dalla ricerca, uno per riga, ciascuno preceduto dalla sua fonte:
+           [DOC-05, riga 8] 05/03/2025,Bonifico,"-1.500,00",IT87 D999 ...
+    3. La domanda.
+
+    `chunk` è la lista di coppie (riferimento, testo) che restituisce la ricerca, per esempio ("DOC-05:8", "05/03/...").
+    """
+    # Blocco 2: ogni chunk diventa una riga. Il riferimento "DOC-05:8" si scrive "[DOC-05, riga 8]",
+    # la stessa forma che le istruzioni chiedono al modello di usare quando cita una fonte.
+    righe_dei_chunk = []
+    for riferimento, testo in chunk:
+        documento, riga = riferimento.split(":")
+        righe_dei_chunk.append(f"[{documento}, riga {riga}] {testo}")
+    elenco_dei_chunk = "\n".join(righe_dei_chunk)
+
+    # I tre blocchi, uno dopo l'altro.
+    return ISTRUZIONI + "\n\nChunk:\n" + elenco_dei_chunk + "\n\nDomanda: " + domanda
 
 
 async def rispondi(domanda: str, chunk: list[tuple[str, str]], modello: str | None = None) -> str:
@@ -57,13 +73,13 @@ async def rispondi(domanda: str, chunk: list[tuple[str, str]], modello: str | No
     if modello.startswith("ollama:"):
         os.environ.setdefault("OLLAMA_BASE_URL", "http://localhost:11434/v1")
     try:
-        esito = await asyncio.wait_for(Agent(modello).run(prompt(domanda, chunk)), ATTESA_MASSIMA)
+        esito = await asyncio.wait_for(Agent(modello).run(costruisci_prompt(domanda, chunk)), ATTESA_MASSIMA)
     except TimeoutError:
         raise RuntimeError(f"il modello non ha risposto in {ATTESA_MASSIMA} secondi") from None
     return esito.output.strip()
 
 
-def precalcolata(numero: str, variante: str) -> tuple[str, str]:
+def risposta_precalcolata(numero: str, variante: str) -> tuple[str, str]:
     """La risposta già calcolata per la domanda `numero` del banco, variante «rag» o «tutto», e da dove viene."""
     riserva = json.loads(PRECALCOLATE.read_text(encoding="utf-8"))
     origine = f"calcolata il {riserva['data']} con {riserva['modello']}"

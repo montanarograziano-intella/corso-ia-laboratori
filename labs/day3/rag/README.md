@@ -1,6 +1,6 @@
 # Notebook RAG: vettoriale o ibrida?
 
-Giorno 3, pomeriggio, slide 132-133 (il banco di prova è presentato nella 131). 50 minuti, ognuno al proprio portatile.
+Giorno 3, pomeriggio, slide 132 (il banco di prova è presentato nella 131). 50 minuti, ognuno al proprio portatile.
 
 Si cerca nel fascicolo in tre modi (parole chiave, vettoriale, ibrida), si misura quale trova il chunk giusto su
 quindici domande, poi un modello risponde citando le fonti. Tutti i dati sono sintetici.
@@ -78,14 +78,14 @@ Misurato il 20/11/2026 su un Mac con processore Apple, con BM25 e con il modello
 Il numero è quante domande hanno il chunk atteso tra i primi risultati. Con i primi 3 e con i primi 5 la tabella è
 la stessa: quando il chunk giusto c'è, sta già tra i primi tre.
 
-| Tipo | Domande | Parole chiave | Vettoriale | Ibrida |
+| Tipo | Domande | Ricerca esatta | Vettoriale | Ibrida |
 |---|---|---|---|---|
 | identificativo | 6 | 6 | 2 | 6 |
 | parafrasi | 6 | 1 | 4 | 2 |
 | contraddizione | 2 | 1 | 1 | 2 |
 | totale | 14 | 8 | 7 | 10 |
 
-Che cosa si legge, per la slide 133:
+Che cosa si legge, per la parte 4:
 
 - La ricerca per parole chiave trova tutti gli identificativi e una sola parafrasi; la vettoriale trova quattro
   parafrasi su sei e due identificativi su sei. Nessuna delle due basta da sola.

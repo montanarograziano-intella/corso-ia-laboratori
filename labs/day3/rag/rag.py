@@ -48,7 +48,7 @@ def chunk_del_corpus(cartelle: tuple[Path, ...] = (FASCICOLO, DISTRATTORI)) -> l
     return chunk
 
 
-def parole(testo: str) -> list[str]:
+def estrai_parole_significative(testo: str) -> list[str]:
     """Orari, indirizzi IP e numeri con il punto restano interi; il resto si divide in parole e numeri."""
     trovate = re.findall(r"\d{1,3}(?:[:.]\d{1,3})+|[a-zà-ù]+|\d+", testo.lower())
     return [parola for parola in trovate if parola not in VUOTE]
@@ -66,7 +66,7 @@ class Archivio:
         self.chunk = chunk if chunk is not None else chunk_del_corpus()
         self.riferimenti = [riferimento for riferimento, _ in self.chunk]
         self.testi = [testo for _, testo in self.chunk]
-        self.bm25 = BM25Okapi([parole(testo) for testo in self.testi])
+        self.bm25 = BM25Okapi([estrai_parole_significative(testo) for testo in self.testi])
         # Il modello resta in questa cartella: la cartella temporanea del sistema viene svuotata tra un giorno e l'altro.
         self.modello = TextEmbedding(MODELLO, cache_dir=str(QUI / ".modelli"))
         self.vettori = self._vettori(self.testi)
@@ -77,25 +77,25 @@ class Archivio:
 
     def punteggi(self, domanda: str) -> tuple[np.ndarray, np.ndarray]:
         """I punteggi di ogni chunk per la domanda: quello per parole chiave e quello vettoriale."""
-        return self.bm25.get_scores(parole(domanda)), self.vettori @ self._vettori([domanda])[0]
+        return self.bm25.get_scores(estrai_parole_significative(domanda)), self.vettori @ self._vettori([domanda])[0]
 
     def cerca(self, domanda: str, modo: str = "ibrida", k: int = 5) -> list[tuple[str, str]]:
-        """I primi k chunk per la domanda. `modo` è «parole», «vettori» o «ibrida»."""
+        """I primi k chunk per la domanda. `modo` è «ricerca esatta», «vettoriale» o «ibrida»."""
         per_parole, per_vettori = self.punteggi(domanda)
         indici = range(len(self.chunk))
         # Un chunk senza nessuna parola della domanda non ha un posto nella ricerca per parole: dargliene uno
         # premierebbe l'ordine dei file. Per questo la ricerca per parole può restituire meno di k chunk.
         ordine = {
-            "parole": sorted((i for i in indici if per_parole[i] > 0), key=lambda i: -per_parole[i]),
-            "vettori": sorted(indici, key=lambda i: -per_vettori[i]),
+            "ricerca esatta": sorted((i for i in indici if per_parole[i] > 0), key=lambda i: -per_parole[i]),
+            "vettoriale": sorted(indici, key=lambda i: -per_vettori[i]),
         }
         if modo == "ibrida":
             posto = {nome: {i: p for p, i in enumerate(lista, 1)} for nome, lista in ordine.items()}
 
             def fusione(i: int) -> float:
                 # Somma dei reciproci dei posti (reciprocal rank fusion, costante 60).
-                per_le_parole = 1 / (60 + posto["parole"][i]) if i in posto["parole"] else 0.0
-                return per_le_parole + 1 / (60 + posto["vettori"][i])
+                per_le_parole = 1 / (60 + posto["ricerca esatta"][i]) if i in posto["ricerca esatta"] else 0.0
+                return per_le_parole + 1 / (60 + posto["vettoriale"][i])
 
             ordine["ibrida"] = sorted(indici, key=lambda i: -fusione(i))
         return [self.chunk[i] for i in ordine[modo][:k]]

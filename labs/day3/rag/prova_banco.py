@@ -16,10 +16,10 @@ from pathlib import Path
 from rag import Archivio, trovato
 
 QUI = Path(__file__).resolve().parent
-MODI = ("parole", "vettori", "ibrida")
+MODI = ("ricerca esatta", "vettoriale", "ibrida")
 
 
-def tabella(archivio: Archivio, k: int = 5) -> tuple[list[dict], dict[str, dict[str, int]]]:
+def valuta_ricerche(archivio: Archivio, k: int = 5) -> tuple[list[dict], dict[str, dict[str, int]]]:
     """Per ogni domanda del banco, l'esito delle tre ricerche; e i conteggi per tipo di domanda."""
     with (QUI / "banco.csv").open(encoding="utf-8") as file:
         domande = list(csv.DictReader(file))
@@ -42,16 +42,16 @@ def main() -> None:
     parser.add_argument("--k", type=int, default=5)
     k = parser.parse_args().k
     archivio = Archivio()
-    esiti, conteggi = tabella(archivio, k)
-    print(f"{len(archivio.chunk)} chunk, primi {k} risultati\n n  tipo             parole  vettori  ibrida")
+    esiti, conteggi = valuta_ricerche(archivio, k)
+    print(f"{len(archivio.chunk)} chunk, primi {k} risultati\n n  tipo             " + "  ".join(MODI))
     for e in esiti:
         if not e["chunk_attesi"]:
             print(f"{e['n']:>2}  {e['tipo']:<16} fuori tabella; l'ibrida trova {', '.join(e['primi']['ibrida'])}")
         else:
-            print(f"{e['n']:>2}  {e['tipo']:<16} " + "  ".join(f"{'sì' if e[m] else 'no':<6}" for m in MODI))
-    print("\ntipo             domande  parole  vettori  ibrida")
+            print(f"{e['n']:>2}  {e['tipo']:<16} " + "  ".join(f"{'sì' if e[m] else 'no':<{len(m)}}" for m in MODI))
+    print("\ntipo             domande  " + "  ".join(MODI))
     for tipo, c in conteggi.items():
-        print(f"{tipo:<16} {c['domande']:>7}  {c['parole']:>6}  {c['vettori']:>7}  {c['ibrida']:>6}")
+        print(f"{tipo:<16} {c['domande']:>7}  " + "  ".join(f"{c[m]:>{len(m)}}" for m in MODI))
 
 
 if __name__ == "__main__":
