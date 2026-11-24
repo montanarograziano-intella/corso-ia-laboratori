@@ -43,7 +43,7 @@ uv sync
 uv run python -c "import visione; visione.scarica_modelli()"
 cd ../rag
 uv sync
-uv run python -c "from rag import Indice; Indice()"
+uv run python -c "from rag import Archivio; Archivio()"
 ```
 
 Su un Mac con processore Intel il notebook di `labs/day3/visione` non funziona: si prepara solo quello di `rag`.

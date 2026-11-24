@@ -1,4 +1,4 @@
-n,tipo,domanda,passi_attesi,nota
+n,tipo,domanda,chunk_attesi,nota
 1,identificativo,Quale movimento ha come destinatario l'IBAN IT87 D999 9999 9990 0000 0123 465?,DOC-05:8,"Il bonifico del 5 marzo. La riga 6 ha un IBAN quasi uguale, che termina con 456"
 2,identificativo,Che cosa risulta dal telefono alle 10:41?,DOC-04:11,La chiamata in uscita non riuscita verso il numero del falso operatore
 3,identificativo,In quale documento compare l'indirizzo 192.0.2.88?,DOC-07:17|DOC-07:18|DOC-07:20|DOC-10:8,Basta una delle quattro righe
@@ -10,7 +10,7 @@ n,tipo,domanda,passi_attesi,nota
 9,parafrasi,Con quale scusa è stata convinta a muovere i risparmi?,DOC-01:8|DOC-02:12|DOC-03:12,"Il conto era in pericolo, qualcuno stava entrando: «spostare il denaro su un conto sicuro». Nei documenti non c'è «scusa» né «risparmi»"
 10,parafrasi,"A che ora del giorno doveva essere spostato il denaro, secondo la chat?",DOC-08:7,Entro mezzogiorno. La chat è in inglese: «Move the money to the safe account by noon»
 11,parafrasi,Che cosa ha sentito il familiare dall'altoparlante?,DOC-02:10,Un uomo che diceva di essere dell'ufficio antifrode. Il verbale dice «vivavoce»
-12,parafrasi,La banca è riuscita a recuperare la prima somma?,DOC-10:6|DOC-03:16,No: il bonifico istantaneo non è revocabile. Nessuna delle tre ricerche trova il passo: è il caso da discutere
+12,parafrasi,La banca è riuscita a recuperare la prima somma?,DOC-10:6|DOC-03:16,No: il bonifico istantaneo non è revocabile. Nessuna delle tre ricerche trova il chunk: è il caso da discutere
 13,contraddizione,Quanto è stato trasferito con il primo bonifico?,DOC-03:14 & DOC-01:9|DOC-02:16|DOC-05:6|DOC-10:6,Devono tornare tutte e due le versioni: 2.400 euro (DOC-03) e 4.200 euro (gli altri)
 14,contraddizione,Per quale ufficio diceva di lavorare chi ha chiamato?,DOC-02:10 & DOC-03:10,Devono tornare tutte e due: «ufficio antifrode» (DOC-02) e «assistenza clienti» (DOC-03)
-15,senza risposta,A che ora è stato eseguito il primo bonifico?,,Nessun documento del fascicolo di Giulia Neri lo dice. Tra i passi dati al modello entra l'estratto conto dell'altra frode (DOC-52): una risposta che cita il bonifico del 17/02/2025 ha una fonte vera e il caso sbagliato. DOC-10 riga 12 spiega perché: gli orari saranno trasmessi su provvedimento. Un orario preciso in una risposta è inventato; una finestra dedotta dalle fonti (durante la telefonata delle 10:19) va accettata
+15,senza risposta,A che ora è stato eseguito il primo bonifico?,,Nessun documento del fascicolo di Giulia Neri lo dice. Tra i chunk dati al modello entra l'estratto conto dell'altra frode (DOC-52): una risposta che cita il bonifico del 17/02/2025 ha una fonte vera e il caso sbagliato. DOC-10 riga 12 spiega perché: gli orari saranno trasmessi su provvedimento. Un orario preciso in una risposta è inventato; una finestra dedotta dalle fonti (durante la telefonata delle 10:19) va accettata
