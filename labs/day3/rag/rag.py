@@ -8,10 +8,13 @@ risposta, e porta il numero di riga della risposta. «DOC-05:8» è la riga 8 de
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Sequence
+from html import escape
 from pathlib import Path
 
 import numpy as np
 from fastembed import TextEmbedding
+from IPython.display import HTML
 from rank_bm25 import BM25Okapi
 
 QUI = Path(__file__).resolve().parent
@@ -103,3 +106,15 @@ class Archivio:
 
             ordine["ibrida"] = sorted(indici, key=lambda i: -fusione(i))
         return [self.chunk[i] for i in ordine[modo][:k]]
+
+
+def tabella(intestazioni: Sequence[str], righe: Iterable[Sequence[object]]) -> HTML:
+    """Una tabella da mostrare nel notebook: si legge meglio del testo allineato con gli spazi, e si copia in un foglio.
+
+    I testi sono messi in HTML così come sono (escape): un chunk con `<`, `|` o `*` non rompe la tabella.
+    """
+
+    def riga(celle: Sequence[object], tag: str) -> str:
+        return "<tr>" + "".join(f'<{tag} style="text-align:left">{escape(str(c))}</{tag}>' for c in celle) + "</tr>"
+
+    return HTML("<table>" + riga(intestazioni, "th") + "".join(riga(r, "td") for r in righe) + "</table>")
