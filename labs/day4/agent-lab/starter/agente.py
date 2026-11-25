@@ -13,12 +13,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")
 
-from pydantic_ai import Agent, DeferredToolRequests, RunContext  # noqa: E402
-from pydantic_ai.models import Model  # noqa: E402
-from pydantic_ai.usage import UsageLimits  # noqa: E402
-
-import strumenti  # noqa: E402
-from strumenti import Contesto  # noqa: E402
+import strumenti
+from pydantic_ai import Agent, DeferredToolRequests, RunContext
+from pydantic_ai.models import Model
+from pydantic_ai.usage import UsageLimits
+from strumenti import Contesto
 
 ISTRUZIONI = """Sei un assistente che aiuta un investigatore di polizia giudiziaria a lavorare su un fascicolo.
 Prima di rispondere leggi tutti i documenti, da DOC-01 a DOC-11, uno per uno. Nella cronologia ogni evento sta su una riga che comincia con la data
@@ -28,7 +27,9 @@ Rispondi in italiano."""
 
 
 def crea_agente(modello: Model | str) -> Agent[Contesto, str | DeferredToolRequests]:
-    agente: Agent[Contesto, str | DeferredToolRequests] = Agent(modello, deps_type=Contesto, output_type=[str, DeferredToolRequests], instructions=ISTRUZIONI)
+    agente: Agent[Contesto, str | DeferredToolRequests] = Agent(
+        modello, deps_type=Contesto, output_type=[str, DeferredToolRequests], instructions=ISTRUZIONI
+    )
 
     @agente.tool
     def cerca_nel_fascicolo(ctx: RunContext[Contesto], domanda: str) -> str:

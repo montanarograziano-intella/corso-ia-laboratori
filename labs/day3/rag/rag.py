@@ -30,9 +30,13 @@ VUOTE = set(
 def chunk_del_corpus(cartelle: tuple[Path, ...] = (FASCICOLO, DISTRATTORI)) -> list[tuple[str, str]]:
     """Restituisce (riferimento, testo) per ogni chunk dei documenti nelle cartelle."""
     chunk = []
-    for cartella in cartelle:  # una cartella mancante darebbe un archivio più piccolo e una tabella sbagliata, in silenzio
+    for (
+        cartella
+    ) in cartelle:  # una cartella mancante darebbe un archivio più piccolo e una tabella sbagliata, in silenzio
         if not cartella.is_dir():
-            raise FileNotFoundError(f"manca la cartella {cartella}: il laboratorio va aperto dentro il repository intero")
+            raise FileNotFoundError(
+                f"manca la cartella {cartella}: il laboratorio va aperto dentro il repository intero"
+            )
     for file in sorted(f for cartella in cartelle for f in cartella.glob("DOC-*")):
         documento = re.match(r"DOC-\d+", file.name).group()
         domanda = ""

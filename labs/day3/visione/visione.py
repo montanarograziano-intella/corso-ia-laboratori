@@ -155,8 +155,9 @@ def confronta(previsti: list[tuple[Riquadro, float]], veri: list[Riquadro], sogl
     return esito
 
 
-def misura(rilevamenti: dict[str, list], veri: dict[str, list[Riquadro]], soglia: float,
-           file: list[str] | None = None) -> dict[str, float]:
+def misura(
+    rilevamenti: dict[str, list], veri: dict[str, list[Riquadro]], soglia: float, file: list[str] | None = None
+) -> dict[str, float]:
     """Precisione e recall su un gruppo di fotogrammi (tutti, se `file` manca)."""
     conti = {"fotogrammi": 0, "oggetti": 0, "TP": 0, "FP": 0, "FN": 0}
     for nome in file if file is not None else list(veri):
@@ -286,7 +287,7 @@ def iban_letto(letto: str, iban_vero: str) -> str:
     o in meno: l'OCR a volte ne aggiunge o ne perde uno."""
     compatto, cercato = re.sub(r"\s", "", letto), re.sub(r"\s", "", iban_vero)
     pezzi = [
-        compatto[inizio:inizio + lunghezza]
+        compatto[inizio : inizio + lunghezza]
         for lunghezza in range(len(cercato) - 3, len(cercato) + 4)
         for inizio in range(max(1, len(compatto) - lunghezza + 1))
     ]
@@ -313,8 +314,10 @@ def incerti(righe: list[list[Parola]], soglia: float = SOGLIA_INCERTO) -> list[t
     """I caratteri sotto la soglia: (parola, carattere, confidenza). Sono quelli da far controllare a una persona."""
     return [
         (parola.testo, carattere, round(confidenza, 2))
-        for riga in righe for parola in riga
-        for carattere, confidenza in zip(parola.testo, parola.confidenze) if confidenza < soglia
+        for riga in righe
+        for parola in riga
+        for carattere, confidenza in zip(parola.testo, parola.confidenze)
+        if confidenza < soglia
     ]
 
 
@@ -361,8 +364,7 @@ def _tensore(uscita) -> torch.Tensor:
 def targhe() -> list[dict]:
     """Le tre foto con la targa di fantasia: il file, la targa vera e il suo riquadro in pixel."""
     return [
-        {"file": riga["file"], "targa": riga["targa"], "riquadro": _riquadro(riga)}
-        for riga in _leggi_csv("targhe.csv")
+        {"file": riga["file"], "targa": riga["targa"], "riquadro": _riquadro(riga)} for riga in _leggi_csv("targhe.csv")
     ]
 
 
@@ -395,7 +397,7 @@ class ModelloVisivo:
         ingresso = self.preparatore(text=prompt, images=[immagine], return_tensors="pt", do_image_splitting=False)
         with torch.inference_mode():
             uscita = self.modello.generate(**ingresso, max_new_tokens=24, do_sample=False)
-        risposta = uscita[:, ingresso["input_ids"].shape[1]:]
+        risposta = uscita[:, ingresso["input_ids"].shape[1] :]
         return self.preparatore.batch_decode(risposta, skip_special_tokens=True)[0].strip()
 
 

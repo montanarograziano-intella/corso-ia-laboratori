@@ -14,8 +14,8 @@ import json
 import os
 from datetime import date
 
-from rag import Archivio
 import risposte
+from rag import Archivio
 from risposte import PRECALCOLATE, QUI, leggi_env, rispondi
 
 DOMANDE_DELLA_PARTE_3 = ("1", "12", "13", "15")
@@ -27,12 +27,15 @@ async def main() -> None:
     risposte.ATTESA_MASSIMA = 600  # qui nessuno aspetta: un modello locale lento deve poter finire
     modello = os.environ["LAB_MODEL"]
     archivio = Archivio()
-    with (QUI / "banco.csv").open(encoding="utf-8") as file:
-        banco = {d["n"]: d for d in csv.DictReader(file)}
+    with (QUI / "golden_dataset.csv").open(encoding="utf-8") as file:
+        golden_dataset = {d["n"]: d for d in csv.DictReader(file)}
     calcolate = {}
     for numero in DOMANDE_DELLA_PARTE_3:
-        domanda = banco[numero]["domanda"]
-        calcolate[numero] = {"domanda": domanda, "rag": await rispondi(domanda, archivio.cerca(domanda, "ibrida", 5), modello)}
+        domanda = golden_dataset[numero]["domanda"]
+        calcolate[numero] = {
+            "domanda": domanda,
+            "rag": await rispondi(domanda, archivio.cerca(domanda, "ibrida", 5), modello),
+        }
         if numero in CON_TUTTO_IL_FASCICOLO:
             calcolate[numero]["tutto"] = await rispondi(domanda, archivio.chunk, modello)
         print(numero, domanda, calcolate[numero], flush=True)

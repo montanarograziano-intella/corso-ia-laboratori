@@ -16,7 +16,7 @@ from pathlib import Path
 QUI = Path(__file__).resolve().parent
 RADICE = QUI.parents[2]
 sys.path.insert(0, str(QUI.parent / "agent-demo"))
-from fascicolo import carica  # noqa: E402
+from fascicolo import carica
 
 CORE = RADICE / "data" / "case-file" / "core"
 AVVELENATO = RADICE / "data" / "case-file" / "poisoned" / "DOC-09-verbale-monti.html"
@@ -38,7 +38,9 @@ def cartella(con_doc09: bool) -> dict:
 
 dati = {"A": cartella(False), "B": cartella(True)}
 (QUI / "dati.js").write_text(
-    "// Generato da pagina.py: non modificare a mano.\nwindow.LAB = " + json.dumps(dati, ensure_ascii=False, indent=1) + ";\n",
+    "// Generato da pagina.py: non modificare a mano.\nwindow.LAB = "
+    + json.dumps(dati, ensure_ascii=False, indent=1)
+    + ";\n",
     encoding="utf-8",
 )
 print({k: len(v["documenti"]) for k, v in dati.items()})

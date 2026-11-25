@@ -3,9 +3,8 @@
 import re
 
 import pytest
-from PIL import Image
-
 import visione
+from PIL import Image
 from visione import (
     DATI,
     FOTO_IBAN,

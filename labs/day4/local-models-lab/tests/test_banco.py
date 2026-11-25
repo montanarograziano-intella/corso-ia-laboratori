@@ -24,7 +24,10 @@ def test_il_json_si_trova_anche_in_mezzo_al_testo() -> None:
 
 
 def test_un_estrazione_e_giusta_solo_se_tutti_i_campi_coincidono() -> None:
-    assert valuta_estrazione('{"ora": "10:19", "durata_minuti": "17"}', {"ora": "10:19", "durata_minuti": 17}) == (True, "")
+    assert valuta_estrazione('{"ora": "10:19", "durata_minuti": "17"}', {"ora": "10:19", "durata_minuti": 17}) == (
+        True,
+        "",
+    )
     ok, motivo = valuta_estrazione('{"ora": "10:12", "durata_minuti": 17}', {"ora": "10:19", "durata_minuti": 17})
     assert not ok and "ora" in motivo
     assert valuta_estrazione("Sono le 10:19.", {"ora": "10:19"})[0] is False
@@ -38,23 +41,36 @@ def test_un_dato_assente_e_giusto_solo_se_il_modello_non_lo_inventa() -> None:
     ok, motivo = valuta_estrazione('{"ora": "10:12"}', {"ora_bonifico": None})
     assert not ok and "campo mancante" in motivo
     assert not valuta_estrazione("{}", {"ora_bonifico": None})[0]
-    assert valuta_estrazione('{"ora_bonifico": ""}', {"ora_bonifico": None})[0]  # il campo c'è ed è vuoto: vale come assente
+    assert valuta_estrazione('{"ora_bonifico": ""}', {"ora_bonifico": None})[
+        0
+    ]  # il campo c'è ed è vuoto: vale come assente
 
 
 def test_un_riassunto_deve_avere_i_fatti_e_non_avere_quelli_sbagliati() -> None:
-    assert valuta_sintesi("Il 4 marzo la signora dice di aver trasferito 2.400 euro.", ["2[.\\s]?400", "4 marzo"], ["4[.\\s]?200"]) == (True, "")
+    assert valuta_sintesi(
+        "Il 4 marzo la signora dice di aver trasferito 2.400 euro.", ["2[.\\s]?400", "4 marzo"], ["4[.\\s]?200"]
+    ) == (True, "")
     ok, motivo = valuta_sintesi("On 4 March she moved the money.", ["2[.\\s]?400"], ["\\b(the|and)\\b"])
     assert not ok and "manca" in motivo and "non doveva" in motivo
 
 
 def test_una_chiamata_e_giusta_se_strumento_e_argomenti_coincidono() -> None:
     atteso = {"strumento": "leggi_movimenti", "argomenti": {"data_iniziale": "03/03/2025", "data_finale": "05/03/2025"}}
-    giusta = [{"function": {"name": "leggi_movimenti", "arguments": {"data_iniziale": "03/03/2025", "data_finale": "05/03/2025"}}}]
+    giusta = [
+        {
+            "function": {
+                "name": "leggi_movimenti",
+                "arguments": {"data_iniziale": "03/03/2025", "data_finale": "05/03/2025"},
+            }
+        }
+    ]
     assert valuta_strumento(giusta, atteso) == (True, "")
     assert not valuta_strumento([], atteso)[0]
     assert not valuta_strumento([{"function": {"name": "leggi_documento", "arguments": {}}}], atteso)[0]
     cerca = {"strumento": "cerca_nel_fascicolo", "argomenti_contengono": {"domanda": "Monti"}}
-    assert valuta_strumento([{"function": {"name": "cerca_nel_fascicolo", "arguments": '{"domanda": "chi è Carla Monti"}'}}], cerca)[0]
+    assert valuta_strumento(
+        [{"function": {"name": "cerca_nel_fascicolo", "arguments": '{"domanda": "chi è Carla Monti"}'}}], cerca
+    )[0]
 
 
 def test_spazi_stretti_e_trattini_tipografici_non_contano_come_errore() -> None:

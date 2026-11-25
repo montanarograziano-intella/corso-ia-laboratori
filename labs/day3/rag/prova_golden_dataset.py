@@ -1,6 +1,6 @@
-"""Prova il banco di domande con le tre ricerche: per parole chiave (BM25), vettoriale e ibrida.
+"""Prova il golden dataset con le tre ricerche: per parole chiave (BM25), vettoriale e ibrida.
 
-Uso: uv run prova_banco.py [--k 5]
+Uso: uv run prova_golden_dataset.py [--k 5]
 
 Per ogni domanda dice se il chunk atteso è tra i primi k risultati di ciascuna ricerca, e stampa la tabella per
 tipo di domanda. La domanda senza risposta resta fuori dalla tabella.
@@ -20,8 +20,8 @@ MODI = ("ricerca esatta", "vettoriale", "ibrida")
 
 
 def valuta_ricerche(archivio: Archivio, k: int = 5) -> tuple[list[dict], dict[str, dict[str, int]]]:
-    """Per ogni domanda del banco, l'esito delle tre ricerche; e i conteggi per tipo di domanda."""
-    with (QUI / "banco.csv").open(encoding="utf-8") as file:
+    """Per ogni domanda del golden dataset, l'esito delle tre ricerche; e i conteggi per tipo di domanda."""
+    with (QUI / "golden_dataset.csv").open(encoding="utf-8") as file:
         domande = list(csv.DictReader(file))
     esiti, conteggi = [], defaultdict(lambda: defaultdict(int))
     for d in domande:

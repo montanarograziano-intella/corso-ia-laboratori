@@ -1,0 +1,17 @@
+# The labs are written at 120 columns; the default 88 would rewrap every file. Notebooks are checked too.
+line-length = 120
+fix = true
+
+[lint]
+# Pyflakes and pycodestyle, plus rule sets whose findings ruff can mostly fix by itself:
+# imports (I), modern syntax (UP), comprehensions (C4), simplifications (SIM, PIE, RET), ruff's own (RUF).
+select = ["E", "W", "F", "I", "UP", "C4", "SIM", "PIE", "RET", "RUF"]
+ignore = [
+    "E501", # the formatter wraps code; long lines left are prose strings, which must not be cut
+    "E402", # tests put the lab folder on sys.path before importing it
+    "SIM905", # a word list written as one string and split reads better than 70 quoted words
+]
+
+[lint.per-file-ignores]
+# Each notebook section imports what it uses, so it can be rerun alone after a kernel restart.
+"*.ipynb" = ["F811"]

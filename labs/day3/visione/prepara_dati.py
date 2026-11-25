@@ -43,35 +43,90 @@ os.environ.setdefault("DOCTR_CACHE_DIR", str(QUI / ".modelli" / "doctr"))
 COCO = ("http://images.cocodataset.org/", "https://s3.amazonaws.com/images.cocodataset.org/")
 ANNOTAZIONI = COCO[1] + "annotations/annotations_trainval2017.zip"
 # Il carattere di Pillow non ha le lettere accentate: le stamperebbe come quadratini.
-DEJAVU = ("https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.tar.bz2",
-          "fa9ca4d13871dd122f61258a80d01751d603b4d3ee14095d65453b4e846e17d7")
+DEJAVU = (
+    "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.tar.bz2",
+    "fa9ca4d13871dd122f61258a80d01751d603b4d3ee14095d65453b4e846e17d7",
+)
 VEICOLI = {"car", "truck", "bus"}
-LICENZE = {4: ("CC BY 2.0", "https://creativecommons.org/licenses/by/2.0/"),
-           5: ("CC BY-SA 2.0", "https://creativecommons.org/licenses/by-sa/2.0/")}
+LICENZE = {
+    4: ("CC BY 2.0", "https://creativecommons.org/licenses/by/2.0/"),
+    5: ("CC BY-SA 2.0", "https://creativecommons.org/licenses/by-sa/2.0/"),
+}
 # Scelte a mano tra le foto di validazione COCO con licenza CC BY o CC BY-SA e almeno due veicoli: strade e
 # parcheggi, persone lontane. Di notte ce ne sono solo cinque: è il punto della slide 43.
-GIORNO = [423617, 429109, 196759, 148719, 85376, 78823, 124798, 356169, 542625, 326627, 142472, 566758,
-          362682, 531036, 89556, 452321, 227511, 369751, 550691, 568290, 284725, 514376, 393226, 93154]
+GIORNO = [
+    423617,
+    429109,
+    196759,
+    148719,
+    85376,
+    78823,
+    124798,
+    356169,
+    542625,
+    326627,
+    142472,
+    566758,
+    362682,
+    531036,
+    89556,
+    452321,
+    227511,
+    369751,
+    550691,
+    568290,
+    284725,
+    514376,
+    393226,
+    93154,
+]
 NOTTE = [170545, 269632, 84170, 176037, 225532]
 # Targhe e volti che il rilevatore di testo non trova, in pixel della foto COCO: controllati a occhio, uno per uno.
 DA_SFOCARE = {
-    89556: [(196, 330, 226, 358)], 227511: [(102, 333, 134, 352)], 393226: [(536, 243, 562, 260)],
-    176037: [(400, 258, 430, 278), (458, 235, 496, 272)], 142472: [(212, 408, 241, 421)],
-    550691: [(130, 314, 158, 327)], 423617: [(520, 440, 556, 462)], 138979: [(164, 297, 190, 320)],
-    85376: [(366, 356, 422, 380), (455, 385, 480, 402)], 542625: [(449, 179, 473, 194), (615, 180, 637, 194)],
+    89556: [(196, 330, 226, 358)],
+    227511: [(102, 333, 134, 352)],
+    393226: [(536, 243, 562, 260)],
+    176037: [(400, 258, 430, 278), (458, 235, 496, 272)],
+    142472: [(212, 408, 241, 421)],
+    550691: [(130, 314, 158, 327)],
+    423617: [(520, 440, 556, 462)],
+    138979: [(164, 297, 190, 320)],
+    85376: [(366, 356, 422, 380), (455, 385, 480, 402)],
+    542625: [(449, 179, 473, 194), (615, 180, 637, 194)],
     124798: [(421, 332, 441, 342), (506, 329, 519, 338), (558, 323, 572, 333), (471, 328, 482, 336)],
     284725: [(146, 336, 168, 354), (74, 264, 91, 281)],
 }
 # Il nome che Flickr mostra per l'autore, letto sulla pagina di ogni foto il 20/11/2026. Quelle che mancano non sono
 # più su Flickr: si cita COCO.
 AUTORI = {  # cspell:disable
-    423617: "SgTransport", 429109: "Oran Viriyincy", 196759: "Rusty Clark ~ 100K Photos", 148719: "dave_7",
-    85376: "Isha Zubeidi", 78823: "Dan Phiffer", 124798: "J", 356169: "Doug Kerr", 542625: "Paul Sableman",
-    326627: "Kristian Thøgersen", 142472: "Elliott Brown", 566758: "Paul Sableman", 362682: "Selmer van Alten",
-    531036: "Elliott Brown", 452321: "Aubrey", 227511: "Jamie", 369751: "Carl Lacey", 550691: "Aubrey",
-    568290: "Alfenaar", 284725: "bfishadow", 514376: "Yuri Levchenko", 393226: "Mr. Brian", 93154: "Oran Viriyincy",
-    170545: "Brian Rawson-Ketchum", 84170: "SgTransport", 176037: "Metropolitan Transportation Authority",
-    225532: "Jason McHuff", 57149: "Jack",
+    423617: "SgTransport",
+    429109: "Oran Viriyincy",
+    196759: "Rusty Clark ~ 100K Photos",
+    148719: "dave_7",
+    85376: "Isha Zubeidi",
+    78823: "Dan Phiffer",
+    124798: "J",
+    356169: "Doug Kerr",
+    542625: "Paul Sableman",
+    326627: "Kristian Thøgersen",
+    142472: "Elliott Brown",
+    566758: "Paul Sableman",
+    362682: "Selmer van Alten",
+    531036: "Elliott Brown",
+    452321: "Aubrey",
+    227511: "Jamie",
+    369751: "Carl Lacey",
+    550691: "Aubrey",
+    568290: "Alfenaar",
+    284725: "bfishadow",
+    514376: "Yuri Levchenko",
+    393226: "Mr. Brian",
+    93154: "Oran Viriyincy",
+    170545: "Brian Rawson-Ketchum",
+    84170: "SgTransport",
+    176037: "Metropolitan Transportation Authority",
+    225532: "Jason McHuff",
+    57149: "Jack",
 }  # cspell:enable
 # Targhe di fantasia nel formato italiano, con lettere che le targhe italiane non usano (I, O, Q, U), ciascuna sopra
 # la targa vera della foto (riquadro in pixel della foto COCO, misurato a occhio).
@@ -81,8 +136,11 @@ TARGHE = {
     138979: ("UO 309 KQ", (403, 323, 453, 356)),
 }
 INGRANDIMENTO = 3
-SCANSIONI = {"DOC-01": "DOC-01-denuncia-neri.txt", "DOC-05": "DOC-05-estratto-conto.csv",
-             "DOC-10": "DOC-10-comunicazione-banca.txt"}
+SCANSIONI = {
+    "DOC-01": "DOC-01-denuncia-neri.txt",
+    "DOC-05": "DOC-05-estratto-conto.csv",
+    "DOC-10": "DOC-10-comunicazione-banca.txt",
+}
 
 
 def scarica(url: str) -> bytes:
@@ -120,8 +178,15 @@ def credito(id_: int, meta: dict, file: str, modifiche: str) -> dict:
         autore, pagina = AUTORI[id_], pagina_flickr(meta["flickr_url"])
     else:
         autore, pagina = "non indicato, foto tolta da Flickr", f"https://cocodataset.org/#explore?id={id_}"
-    return {"file": file, "coco_id": id_, "autore": autore, "pagina": pagina, "licenza": LICENZE[meta["license"]][0],
-            "licenza_url": LICENZE[meta["license"]][1], "modifiche": modifiche}
+    return {
+        "file": file,
+        "coco_id": id_,
+        "autore": autore,
+        "pagina": pagina,
+        "licenza": LICENZE[meta["license"]][0],
+        "licenza_url": LICENZE[meta["license"]][1],
+        "modifiche": modifiche,
+    }
 
 
 def pagina_flickr(flickr_url: str) -> str:
@@ -136,8 +201,12 @@ def sfoca(im: Image.Image, riquadri: list[tuple[float, float, float, float]]) ->
             continue
         zona = im.crop((x0, y0, x1, y1))
         raggio = max(4, min(x1 - x0, y1 - y0) // 3)
-        im.paste(zona.resize((max(1, (x1 - x0) // 8), max(1, (y1 - y0) // 8))).resize(zona.size).filter(
-            ImageFilter.GaussianBlur(raggio)), (x0, y0))
+        im.paste(
+            zona.resize((max(1, (x1 - x0) // 8), max(1, (y1 - y0) // 8)))
+            .resize(zona.size)
+            .filter(ImageFilter.GaussianBlur(raggio)),
+            (x0, y0),
+        )
     return im
 
 
@@ -164,8 +233,13 @@ def targa(testo: str, larghezza: int, altezza: int) -> Image.Image:
     d.rectangle([0, 0, larghezza - 1, altezza - 1], outline="black", width=max(1, altezza // 28))
     d.rectangle([3, 3, fascia, altezza - 4], fill=blu)
     d.rectangle([larghezza - fascia, 3, larghezza - 4, altezza - 4], fill=blu)
-    d.text((fascia // 2, int(altezza * 0.75)), "I", font=ImageFont.load_default(size=int(fascia * 0.7)), fill="white",
-           anchor="mm")
+    d.text(
+        (fascia // 2, int(altezza * 0.75)),
+        "I",
+        font=ImageFont.load_default(size=int(fascia * 0.7)),
+        fill="white",
+        anchor="mm",
+    )
     corpo = int(altezza * 0.7)
     while d.textlength(testo, font=ImageFont.load_default(size=corpo)) > (larghezza - 2 * fascia) * 0.92:
         corpo -= 1
@@ -181,9 +255,11 @@ def righe_del_documento(documento: str) -> list[str]:
     intestazione = [riga.lstrip("# ") for riga in righe if riga.startswith("#")]
     tabella = list(csv.reader(riga for riga in righe if not riga.startswith("#")))
     titoli = ["Data", "Descrizione", "Importo", "IBAN destinatario"]
-    return [pezzo for riga in intestazione for pezzo in textwrap.wrap(riga, 84)] + [""] + [
-        f"{a:<12}{b:<22}{c:>10}   {d}".rstrip() for a, b, c, d in [titoli] + tabella[1:]
-    ]
+    return (
+        [pezzo for riga in intestazione for pezzo in textwrap.wrap(riga, 84)]
+        + [""]
+        + [f"{a:<12}{b:<22}{c:>10}   {d}".rstrip() for a, b, c, d in [titoli, *tabella[1:]]]
+    )
 
 
 def scansione(righe: list[str], seme: int) -> Image.Image:
@@ -219,8 +295,12 @@ def main() -> None:
         per_immagine.setdefault(a["image_id"], []).append(a)
 
     def riquadri(id_: int, nomi: set[str]) -> list[tuple[float, float, float, float]]:
-        return [(x, y, x + w, y + h) for a in per_immagine[id_] if categorie[a["category_id"]] in nomi
-                for x, y, w, h in [a["bbox"]]]
+        return [
+            (x, y, x + w, y + h)
+            for a in per_immagine[id_]
+            if categorie[a["category_id"]] in nomi
+            for x, y, w, h in [a["bbox"]]
+        ]
 
     for cartella in ("fotogrammi", "targhe", "scansioni"):
         (DATI / cartella).mkdir(parents=True, exist_ok=True)
@@ -233,8 +313,10 @@ def main() -> None:
         nome = f"F{numero:02d}.jpg"
         im.save(DATI / "fotogrammi" / nome, quality=88)
         foto.append({"file": nome, "gruppo": gruppo})
-        veri += [{"file": nome, "x0": round(x0, 1), "y0": round(y0, 1), "x1": round(x1, 1), "y1": round(y1, 1)}
-                 for x0, y0, x1, y1 in veicoli]
+        veri += [
+            {"file": nome, "x0": round(x0, 1), "y0": round(y0, 1), "x1": round(x1, 1), "y1": round(y1, 1)}
+            for x0, y0, x1, y1 in veicoli
+        ]
         crediti.append(credito(id_, meta, f"fotogrammi/{nome}", "persone e targhe sfocate"))
     for numero, (id_, (testo, (x0, y0, x1, y1))) in enumerate(TARGHE.items(), 1):
         meta = immagini[id_]
@@ -248,17 +330,30 @@ def main() -> None:
         im.paste(finta, posto)
         nome = f"T{numero}.jpg"
         im.save(DATI / "targhe" / nome, quality=85)
-        targhe.append({"file": nome, "targa": testo, "x0": posto[0], "y0": posto[1],
-                       "x1": posto[0] + finta.width, "y1": posto[1] + finta.height})
-        crediti.append(credito(id_, meta, f"targhe/{nome}",
-                               "persone e targhe sfocate, ingrandita, targa di fantasia aggiunta"))
+        targhe.append(
+            {
+                "file": nome,
+                "targa": testo,
+                "x0": posto[0],
+                "y0": posto[1],
+                "x1": posto[0] + finta.width,
+                "y1": posto[1] + finta.height,
+            }
+        )
+        crediti.append(
+            credito(id_, meta, f"targhe/{nome}", "persone e targhe sfocate, ingrandita, targa di fantasia aggiunta")
+        )
     for seme, documento in enumerate(SCANSIONI, 1):
         righe = righe_del_documento(documento)
         scansione(righe, seme).save(DATI / "scansioni" / f"{documento}.jpg", quality=72)
         (DATI / "scansioni" / f"{documento}.txt").write_text("\n".join(righe) + "\n", encoding="utf-8")
 
-    for nome, righe in (("fotogrammi.csv", foto), ("veicoli.csv", veri), ("targhe.csv", targhe),
-                        ("crediti.csv", crediti)):
+    for nome, righe in (
+        ("fotogrammi.csv", foto),
+        ("veicoli.csv", veri),
+        ("targhe.csv", targhe),
+        ("crediti.csv", crediti),
+    ):
         with (DATI / nome).open("w", encoding="utf-8", newline="") as file:
             scrittore = csv.DictWriter(file, fieldnames=list(righe[0]))
             scrittore.writeheader()

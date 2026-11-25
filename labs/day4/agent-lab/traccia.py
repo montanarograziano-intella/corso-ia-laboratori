@@ -18,7 +18,13 @@ class Traccia:
     def scrivi(self, tipo: str, **campi: Any) -> None:
         """Write one record. `tipo` is one of: richiesta, strumento, approvazione, risposta, limite."""
         self.passo += 1
-        record = {"esecuzione": self.esecuzione, "passo": self.passo, "ora": datetime.now().isoformat(timespec="seconds"), "tipo": tipo, **campi}
+        record = {
+            "esecuzione": self.esecuzione,
+            "passo": self.passo,
+            "ora": datetime.now().isoformat(timespec="seconds"),
+            "tipo": tipo,
+            **campi,
+        }
         with self.path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
 

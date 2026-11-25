@@ -16,10 +16,23 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from fascicolo import eventi  # noqa: E402
+from fascicolo import eventi
 
 RIFERIMENTO = Path(__file__).parents[3] / "data" / "case-file" / "reference" / "timeline.csv"
-MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"]
+MESI = [
+    "gennaio",
+    "febbraio",
+    "marzo",
+    "aprile",
+    "maggio",
+    "giugno",
+    "luglio",
+    "agosto",
+    "settembre",
+    "ottobre",
+    "novembre",
+    "dicembre",
+]
 
 
 def forme_della_data(iso: str) -> list[str]:
@@ -27,7 +40,11 @@ def forme_della_data(iso: str) -> list[str]:
     anno, mese, giorno = iso.split("-")
     nome = MESI[int(mese) - 1]
     giorni, mesi = {giorno, str(int(giorno))}, {mese, str(int(mese))}
-    return [iso, *(f"{g}/{m}/{anno}" for g in giorni for m in mesi), *(f"{g} {m}" for g in giorni for m in (nome, nome[:3]))]
+    return [
+        iso,
+        *(f"{g}/{m}/{anno}" for g in giorni for m in mesi),
+        *(f"{g} {m}" for g in giorni for m in (nome, nome[:3])),
+    ]
 
 
 def contiene(riga: str, forma: str) -> bool:
@@ -54,7 +71,9 @@ def confronta(risposta: str, riferimento: Path = RIFERIMENTO, con_fonte: bool = 
     usati: set[int] = set()  # una riga della risposta vale per un solo evento di riferimento
     esiti = []
     for evento in csv.DictReader(righe):
-        indice = next((n for n, riga in enumerate(blocchi) if n not in usati and corrisponde(riga, evento, con_fonte)), None)
+        indice = next(
+            (n for n, riga in enumerate(blocchi) if n not in usati and corrisponde(riga, evento, con_fonte)), None
+        )
         if indice is not None:
             usati.add(indice)
         esiti.append((evento, indice is not None))

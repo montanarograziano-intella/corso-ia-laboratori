@@ -37,7 +37,7 @@ if not HOST.startswith("http"):
     HOST = "http://" + HOST
 VERDE, ROSSO, GRIGIO, FINE = "\033[32m", "\033[31m", "\033[90m", "\033[0m"
 if os.name == "nt":
-    os.system("")  # noqa: S605, S607 (su Windows accende i colori nella console; non esegue nulla)
+    os.system("")
 # Il nome del computer distingue nel visore le prove dei docenti da quelle del gruppo. LAB_MACCHINA lo sostituisce.
 MACCHINA = os.environ.get("LAB_MACCHINA") or platform.node()
 SISTEMA = "Sei un assistente che aiuta un investigatore a lavorare su un fascicolo. Rispondi in italiano, solo con ciò che è scritto nei documenti."
@@ -45,8 +45,12 @@ SISTEMA = "Sei un assistente che aiuta un investigatore a lavorare su un fascico
 
 def chiama(percorso: str, corpo: dict | None = None, flusso: bool = False):
     """Una chiamata all'API di Ollama. Con `flusso` restituisce una alla volta le righe JSON di una risposta in streaming."""
-    richiesta = urllib.request.Request(HOST + percorso, data=json.dumps(corpo).encode() if corpo is not None else None, headers={"Content-Type": "application/json"})
-    risposta = urllib.request.urlopen(richiesta, timeout=600)  # noqa: S310 (un indirizzo locale scelto da chi usa il banco)
+    richiesta = urllib.request.Request(
+        HOST + percorso,
+        data=json.dumps(corpo).encode() if corpo is not None else None,
+        headers={"Content-Type": "application/json"},
+    )
+    risposta = urllib.request.urlopen(richiesta, timeout=600)
     if flusso:
         return (json.loads(riga) for riga in risposta if riga.strip())
     return json.loads(risposta.read())
@@ -59,11 +63,13 @@ def documento(id_documento: str) -> str:
 
 # --- scoring: pure functions, tested in tests/ -------------------------------------------------------------------
 
-TIPOGRAFICI = str.maketrans({**dict.fromkeys("\u2010\u2011\u2012\u2013\u2212", "-"), **dict.fromkeys("\u00a0\u2009\u202f", " ")})
+TIPOGRAFICI = str.maketrans(
+    {**dict.fromkeys("\u2010\u2011\u2012\u2013\u2212", "-"), **dict.fromkeys("\u00a0\u2009\u202f", " ")}
+)
 
 
 def piano(testo: str) -> str:
-    """I modelli scrivono «4 marzo» e DOC‑05 con spazi stretti e trattini tipografici: si rendono semplici prima di dare il voto."""
+    """I modelli scrivono «4 marzo» e DOC‑05 con spazi stretti e trattini tipografici: si rendono semplici prima di dare il voto."""  # noqa: RUF002 (l'esempio è il punto)
     return testo.translate(TIPOGRAFICI)
 
 
@@ -107,7 +113,11 @@ def valuta_estrazione(testo: str, atteso: dict) -> tuple[bool, str]:
     mancanti = [campo for campo in atteso if campo not in ottenuto]
     if mancanti:  # un dato atteso assente non è dimostrato da un campo che manca o che ha un altro nome
         return False, "campo mancante: " + ", ".join(mancanti)
-    sbagliati = [f"{campo}: atteso {atteso[campo]!r}, ottenuto {ottenuto.get(campo)!r}" for campo in atteso if semplice(ottenuto.get(campo)) != semplice(atteso[campo])]
+    sbagliati = [
+        f"{campo}: atteso {atteso[campo]!r}, ottenuto {ottenuto.get(campo)!r}"
+        for campo in atteso
+        if semplice(ottenuto.get(campo)) != semplice(atteso[campo])
+    ]
     return (not sbagliati), "; ".join(sbagliati)
 
 
@@ -115,7 +125,9 @@ def valuta_sintesi(testo: str, deve: list[str], non_deve: list[str]) -> tuple[bo
     testo = piano(testo)
     mancanti = [p for p in deve if not re.search(p, testo, re.IGNORECASE)]
     vietati = [p for p in non_deve if re.search(p, testo, re.IGNORECASE)]
-    motivi = ([f"manca: {' / '.join(mancanti)}"] if mancanti else []) + ([f"non doveva esserci: {' / '.join(vietati)}"] if vietati else [])
+    motivi = ([f"manca: {' / '.join(mancanti)}"] if mancanti else []) + (
+        [f"non doveva esserci: {' / '.join(vietati)}"] if vietati else []
+    )
     return (not motivi), "; ".join(motivi)
 
 
@@ -128,19 +140,48 @@ def valuta_strumento(chiamate: list[dict], atteso: dict) -> tuple[bool, str]:
         argomenti = primo_json(argomenti) or {}
     if nome != atteso["strumento"]:
         return False, f"strumento: atteso {atteso['strumento']}, chiamato {nome}"
-    sbagliati = [f"{k}: atteso {v!r}, ottenuto {argomenti.get(k)!r}" for k, v in atteso.get("argomenti", {}).items() if semplice(argomenti.get(k)) != semplice(v)]
-    sbagliati += [f"{k}: doveva contenere {v!r}, ottenuto {argomenti.get(k)!r}" for k, v in atteso.get("argomenti_contengono", {}).items() if semplice(v) not in semplice(argomenti.get(k))]
+    sbagliati = [
+        f"{k}: atteso {v!r}, ottenuto {argomenti.get(k)!r}"
+        for k, v in atteso.get("argomenti", {}).items()
+        if semplice(argomenti.get(k)) != semplice(v)
+    ]
+    sbagliati += [
+        f"{k}: doveva contenere {v!r}, ottenuto {argomenti.get(k)!r}"
+        for k, v in atteso.get("argomenti_contengono", {}).items()
+        if semplice(v) not in semplice(argomenti.get(k))
+    ]
     return (not sbagliati), "; ".join(sbagliati)
 
 
 # --- one run -----------------------------------------------------------------------------------------------------
 
-def chiedi(modello: str, capacita: list[str], domanda: dict, strumenti: list[dict], contesto: int, vincolato: bool, ragiona: bool = False) -> dict:
+
+def chiedi(
+    modello: str,
+    capacita: list[str],
+    domanda: dict,
+    strumenti: list[dict],
+    contesto: int,
+    vincolato: bool,
+    ragiona: bool = False,
+) -> dict:
     """Fa una domanda e restituisce la risposta con le sue misure."""
-    nomi = sorted(p.name[:6] for p in (FASCICOLO / "core").glob("DOC-*")) if domanda["documenti"] == "tutti" else domanda["documenti"]
+    nomi = (
+        sorted(p.name[:6] for p in (FASCICOLO / "core").glob("DOC-*"))
+        if domanda["documenti"] == "tutti"
+        else domanda["documenti"]
+    )
     testo_documenti = "\n\n".join(documento(d) for d in nomi)
-    messaggi = [{"role": "system", "content": SISTEMA}, {"role": "user", "content": (testo_documenti + "\n\n" if testo_documenti else "") + domanda["domanda"]}]
-    corpo: dict = {"model": modello, "messages": messaggi, "stream": True, "options": {"temperature": 0, "seed": 7, "num_ctx": contesto, "num_predict": 8000 if ragiona else 600}}
+    messaggi = [
+        {"role": "system", "content": SISTEMA},
+        {"role": "user", "content": (testo_documenti + "\n\n" if testo_documenti else "") + domanda["domanda"]},
+    ]
+    corpo: dict = {
+        "model": modello,
+        "messages": messaggi,
+        "stream": True,
+        "options": {"temperature": 0, "seed": 7, "num_ctx": contesto, "num_predict": 8000 if ragiona else 600},
+    }
     if "thinking" in capacita:
         corpo["think"] = ragiona  # spento di solito: il banco misura la risposta, non il ragionamento
     if domanda["tipo"] == "strumento":
@@ -148,7 +189,11 @@ def chiedi(modello: str, capacita: list[str], domanda: dict, strumenti: list[dic
             return {"testo": "", "chiamate": [], "errore": "il modello non supporta gli strumenti"}
         corpo["tools"] = [{"type": "function", "function": s} for s in strumenti]
     if domanda["tipo"] in ("estrazione", "fascicolo") and vincolato:
-        corpo["format"] = {"type": "object", "properties": {k: {} for k in domanda["atteso"]}, "required": list(domanda["atteso"])}
+        corpo["format"] = {
+            "type": "object",
+            "properties": {k: {} for k in domanda["atteso"]},
+            "required": list(domanda["atteso"]),
+        }
     inizio, primo, testo, chiamate, ultima = time.monotonic(), None, "", [], {}
     try:
         for pezzo in chiama("/api/chat", corpo, flusso=True):
@@ -162,7 +207,9 @@ def chiedi(modello: str, capacita: list[str], domanda: dict, strumenti: list[dic
         return {"testo": testo, "chiamate": chiamate, "errore": f"{type(errore).__name__}: {errore}"}
     durata = ultima.get("eval_duration") or 0
     return {
-        "testo": testo, "chiamate": chiamate, "errore": None,
+        "testo": testo,
+        "chiamate": chiamate,
+        "errore": None,
         "primo_token_s": round(primo, 2) if primo is not None else None,
         "token": ultima.get("eval_count") or 0,
         "token_al_secondo": round(ultima["eval_count"] / (durata / 1e9), 1) if durata else None,
@@ -170,7 +217,9 @@ def chiedi(modello: str, capacita: list[str], domanda: dict, strumenti: list[dic
     }
 
 
-def esegui(modello: str, contesto: int, vincolato: bool, etichetta: str | None, solo: list[str], ragiona: bool = False) -> dict:
+def esegui(
+    modello: str, contesto: int, vincolato: bool, etichetta: str | None, solo: list[str], ragiona: bool = False
+) -> dict:
     banco = json.loads((QUI / "domande.json").read_text(encoding="utf-8"))
     try:
         scheda = chiama("/api/show", {"model": modello})
@@ -181,7 +230,9 @@ def esegui(modello: str, contesto: int, vincolato: bool, etichetta: str | None, 
     capacita = scheda.get("capabilities", [])
     # Il modello si carica prima del cronometro, con la stessa finestra: il tempo al primo token non misura il caricamento.
     chiama("/api/generate", {"model": modello, "options": {"num_ctx": contesto}})
-    print(f"\n{modello}  ·  contesto {contesto}{'  ·  JSON vincolato' if vincolato else ''}{'  ·  ' + etichetta if etichetta else ''}")
+    print(
+        f"\n{modello}  ·  contesto {contesto}{'  ·  JSON vincolato' if vincolato else ''}{'  ·  ' + etichetta if etichetta else ''}"
+    )
     print(f"{GRIGIO}capacità dichiarate: {', '.join(capacita) or 'nessuna'}{FINE}")
     esiti = []
     for domanda in banco["domande"]:
@@ -196,10 +247,24 @@ def esegui(modello: str, contesto: int, vincolato: bool, etichetta: str | None, 
             ok, motivo = valuta_sintesi(r["testo"], domanda["deve_contenere"], domanda.get("non_deve_contenere", []))
         else:
             ok, motivo = valuta_strumento(r["chiamate"], domanda["atteso"])
-        print(f"{VERDE + '  ✓' if ok else ROSSO + '  ✗'} {domanda['id']} {domanda['titolo']}{FINE}" + (f"{GRIGIO}  {motivo}{FINE}" if motivo else ""))
-        esiti.append({"id": domanda["id"], "tipo": domanda["tipo"], "titolo": domanda["titolo"], "ok": ok, "motivo": motivo, **{k: r.get(k) for k in ("testo", "chiamate", "primo_token_s", "token", "token_al_secondo", "secondi")}})
+        print(
+            f"{VERDE + '  ✓' if ok else ROSSO + '  ✗'} {domanda['id']} {domanda['titolo']}{FINE}"
+            + (f"{GRIGIO}  {motivo}{FINE}" if motivo else "")
+        )
+        esiti.append(
+            {
+                "id": domanda["id"],
+                "tipo": domanda["tipo"],
+                "titolo": domanda["titolo"],
+                "ok": ok,
+                "motivo": motivo,
+                **{k: r.get(k) for k in ("testo", "chiamate", "primo_token_s", "token", "token_al_secondo", "secondi")},
+            }
+        )
     nomi = {modello, modello + ":latest"}
-    caricato = next((m for m in chiama("/api/ps").get("models", []) if m.get("name") in nomi or m.get("model") in nomi), {})
+    caricato = next(
+        (m for m in chiama("/api/ps").get("models", []) if m.get("name") in nomi or m.get("model") in nomi), {}
+    )
 
     def media(campo: str) -> float | None:
         """La media sulle domande che hanno questa misura: un modello che non risponde non ha un primo token."""
@@ -207,26 +272,47 @@ def esegui(modello: str, contesto: int, vincolato: bool, etichetta: str | None, 
         return round(sum(valori) / len(valori), 2) if valori else None
 
     riepilogo = {
-        "modello": modello, "etichetta": etichetta, "contesto": contesto, "vincolato": vincolato, "ragiona": ragiona, "capacita": capacita,
-        "quando": datetime.now().isoformat(timespec="seconds"), "macchina": MACCHINA,
-        "parametri": scheda.get("details", {}).get("parameter_size"), "quantizzazione": scheda.get("details", {}).get("quantization_level"),
-        "corrette": sum(e["ok"] for e in esiti), "domande": len(esiti),
-        "per_tipo": {t: [sum(e["ok"] for e in esiti if e["tipo"] == t), sum(1 for e in esiti if e["tipo"] == t)] for t in ("estrazione", "fascicolo", "sintesi", "strumento")},
-        "primo_token_s": media("primo_token_s"), "token_al_secondo": media("token_al_secondo"),
-        "memoria_gb": round(caricato.get("size", 0) / 1e9, 1) or None, "in_gpu_gb": round(caricato.get("size_vram", 0) / 1e9, 1) or None,
+        "modello": modello,
+        "etichetta": etichetta,
+        "contesto": contesto,
+        "vincolato": vincolato,
+        "ragiona": ragiona,
+        "capacita": capacita,
+        "quando": datetime.now().isoformat(timespec="seconds"),
+        "macchina": MACCHINA,
+        "parametri": scheda.get("details", {}).get("parameter_size"),
+        "quantizzazione": scheda.get("details", {}).get("quantization_level"),
+        "corrette": sum(e["ok"] for e in esiti),
+        "domande": len(esiti),
+        "per_tipo": {
+            t: [sum(e["ok"] for e in esiti if e["tipo"] == t), sum(1 for e in esiti if e["tipo"] == t)]
+            for t in ("estrazione", "fascicolo", "sintesi", "strumento")
+        },
+        "primo_token_s": media("primo_token_s"),
+        "token_al_secondo": media("token_al_secondo"),
+        "memoria_gb": round(caricato.get("size", 0) / 1e9, 1) or None,
+        "in_gpu_gb": round(caricato.get("size_vram", 0) / 1e9, 1) or None,
         "secondi": round(sum(e["secondi"] or 0 for e in esiti), 1),
         "esiti": esiti,
     }
     colore = VERDE if riepilogo["corrette"] == riepilogo["domande"] else ROSSO
-    print(f"{colore}  {riepilogo['corrette']} corrette su {riepilogo['domande']}{FINE}  ·  primo token {riepilogo['primo_token_s']} s  ·  {riepilogo['token_al_secondo']} token/s  ·  memoria {riepilogo['memoria_gb']} GB  ·  {riepilogo['secondi']} s in tutto")
+    print(
+        f"{colore}  {riepilogo['corrette']} corrette su {riepilogo['domande']}{FINE}  ·  primo token {riepilogo['primo_token_s']} s  ·  {riepilogo['token_al_secondo']} token/s  ·  memoria {riepilogo['memoria_gb']} GB  ·  {riepilogo['secondi']} s in tutto"
+    )
     return riepilogo
 
 
 def salva(riepilogo: dict) -> None:
     """Scrive la prova in risultati/ e ricostruisce visore/risultati.js da tutte le prove salvate."""
-    nome = re.sub(r"[^a-z0-9.]+", "-", (riepilogo["modello"] + ("-" + riepilogo["etichetta"] if riepilogo["etichetta"] else "")).lower()).strip("-")
+    nome = re.sub(
+        r"[^a-z0-9.]+",
+        "-",
+        (riepilogo["modello"] + ("-" + riepilogo["etichetta"] if riepilogo["etichetta"] else "")).lower(),
+    ).strip("-")
     (QUI / "risultati").mkdir(exist_ok=True)
-    (QUI / "risultati" / f"{nome}.json").write_text(json.dumps(riepilogo, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    (QUI / "risultati" / f"{nome}.json").write_text(
+        json.dumps(riepilogo, ensure_ascii=False, indent=1) + "\n", encoding="utf-8"
+    )
     ricostruisci_visore()
 
 
@@ -236,18 +322,35 @@ def ricostruisci_visore() -> None:
     base = {c["modello"]: c["corrette"] / max(c["domande"], 1) for c in corse if "esiti" in c and not c["etichetta"]}
     corse.sort(key=lambda c: (-base.get(c["modello"], 0), c["modello"], c.get("etichetta") or ""))
     banco = json.loads((QUI / "domande.json").read_text(encoding="utf-8"))
-    dati = {"domande": [{k: d.get(k) for k in ("id", "tipo", "titolo", "domanda", "atteso", "deve_contenere")} for d in banco["domande"]], "corse": [c for c in corse if "esiti" in c], "agente": [c for c in corse if "agente" in c]}
+    dati = {
+        "domande": [
+            {k: d.get(k) for k in ("id", "tipo", "titolo", "domanda", "atteso", "deve_contenere")}
+            for d in banco["domande"]
+        ],
+        "corse": [c for c in corse if "esiti" in c],
+        "agente": [c for c in corse if "agente" in c],
+    }
     intestazione = "// File generato da banco.py (ricostruisci_visore) da risultati/*.json e domande.json. Non modificare a mano.\n"
-    (QUI / "visore" / "risultati.js").write_text(intestazione + "window.RISULTATI = " + json.dumps(dati, ensure_ascii=False, indent=1) + ";\n", encoding="utf-8")
+    (QUI / "visore" / "risultati.js").write_text(
+        intestazione + "window.RISULTATI = " + json.dumps(dati, ensure_ascii=False, indent=1) + ";\n", encoding="utf-8"
+    )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("modelli", nargs="*", help="nomi dei modelli come li conosce Ollama")
-    parser.add_argument("--ricostruisci", action="store_true", help="rifà visore/risultati.js dalle prove salvate, senza interrogare modelli")
+    parser.add_argument(
+        "--ricostruisci",
+        action="store_true",
+        help="rifà visore/risultati.js dalle prove salvate, senza interrogare modelli",
+    )
     parser.add_argument("--contesto", type=int, default=8192, help="finestra di contesto in token (num_ctx)")
     parser.add_argument("--vincolato", action="store_true", help="forza un JSON valido sulle domande di estrazione")
-    parser.add_argument("--ragiona", action="store_true", help="lascia ragionare il modello prima di rispondere (solo modelli con questa capacità)")
+    parser.add_argument(
+        "--ragiona",
+        action="store_true",
+        help="lascia ragionare il modello prima di rispondere (solo modelli con questa capacità)",
+    )
     parser.add_argument("--etichetta", help="nome di questa prova nei risultati, per un esperimento")
     parser.add_argument("--solo", nargs="*", default=[], help="solo queste domande, per esempio E1 T2")
     parser.add_argument("--non-salvare", action="store_true")
@@ -259,7 +362,9 @@ def main() -> None:
         parser.error("serve almeno un modello, oppure --ricostruisci")
     for modello in args.modelli:
         riepilogo = esegui(modello, args.contesto, args.vincolato, args.etichetta, args.solo, args.ragiona)
-        if not args.non_salvare and (not args.solo or args.etichetta):  # una prova parziale si salva solo con un nome suo
+        if not args.non_salvare and (
+            not args.solo or args.etichetta
+        ):  # una prova parziale si salva solo con un nome suo
             salva(riepilogo)
         chiama("/api/generate", {"model": modello, "keep_alive": 0})  # libera la memoria prima del modello successivo
     if not args.non_salvare and (not args.solo or args.etichetta):

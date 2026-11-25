@@ -1,7 +1,7 @@
      1	DATI SINTETICI - USO DIDATTICO
      2	DOC-08 · Estratto di chat in lingua inglese
      3	Acquisito il 12 marzo 2025 presso il fornitore di hosting di banca-esempio-accesso.invalid, su provvedimento dell'Autorità Giudiziaria del 10 marzo 2025. Nomi utente di fantasia.
-     4	
+     4
      5	[02/03/2025 23:05] user_k: Got her login. Phone number is in the form too.
      6	[02/03/2025 23:07] user_m: Good. Send the SMS in the morning, then call her. Say you are from the bank.
      7	[02/03/2025 23:08] user_m: Move the money to the safe account by noon.

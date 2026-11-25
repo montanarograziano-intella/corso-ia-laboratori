@@ -16,13 +16,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")
 
-from pydantic_ai import Agent, DeferredToolRequests, RunContext, ToolApproved, ToolDenied  # noqa: E402
-from pydantic_ai.models import Model  # noqa: E402
-from pydantic_ai.usage import UsageLimits  # noqa: E402
-
-import strumenti  # noqa: E402
-from gate import DESTINATARI_AMMESSI, Decisione, applica_regole  # noqa: E402
-from strumenti import Contesto  # noqa: E402
+import strumenti
+from gate import DESTINATARI_AMMESSI, Decisione, applica_regole
+from pydantic_ai import Agent, DeferredToolRequests, RunContext, ToolApproved, ToolDenied
+from pydantic_ai.models import Model
+from pydantic_ai.usage import UsageLimits
+from strumenti import Contesto
 
 MAX_PASSI = 25  # richieste al modello in tutta l'esecuzione, comprese le riprese dopo un punto di controllo
 ISTRUZIONI = """Sei un assistente che aiuta un investigatore di polizia giudiziaria a lavorare su un fascicolo.
@@ -56,12 +55,16 @@ def leggi_movimenti(contesto: Contesto, data_iniziale: str, data_finale: str) ->
     for n, riga in righe[1:]:
         campi = dict(zip(intestazione, next(csv.reader(io.StringIO(riga))), strict=False))
         if inizio <= chiave(campi["data"]) <= fine:
-            trovati.append(f"[DOC-05, riga {n}] {campi['data']} {campi['descrizione']} {campi['importo']} {campi['iban_destinatario']}".strip())
+            trovati.append(
+                f"[DOC-05, riga {n}] {campi['data']} {campi['descrizione']} {campi['importo']} {campi['iban_destinatario']}".strip()
+            )
     return "\n".join(trovati) or "nessun movimento nell'intervallo"
 
 
 def crea_agente(modello: Model | str) -> Agent[Contesto, str | DeferredToolRequests]:
-    agente: Agent[Contesto, str | DeferredToolRequests] = Agent(modello, deps_type=Contesto, output_type=[str, DeferredToolRequests], instructions=ISTRUZIONI)
+    agente: Agent[Contesto, str | DeferredToolRequests] = Agent(
+        modello, deps_type=Contesto, output_type=[str, DeferredToolRequests], instructions=ISTRUZIONI
+    )
 
     def registra(ctx: RunContext[Contesto], nome: str, argomenti: dict, risultato: str) -> str:
         ctx.deps.traccia.scrivi("strumento", strumento=nome, argomenti=argomenti, risultato=risultato[:120])
@@ -70,22 +73,36 @@ def crea_agente(modello: Model | str) -> Agent[Contesto, str | DeferredToolReque
     @agente.tool
     def cerca_nel_fascicolo(ctx: RunContext[Contesto], domanda: str) -> str:
         """Cerca nei documenti del fascicolo e restituisce le righe pertinenti con documento e numero di riga."""
-        return registra(ctx, "cerca_nel_fascicolo", {"domanda": domanda}, strumenti.cerca_nel_fascicolo(ctx.deps, domanda))
+        return registra(
+            ctx, "cerca_nel_fascicolo", {"domanda": domanda}, strumenti.cerca_nel_fascicolo(ctx.deps, domanda)
+        )
 
     @agente.tool
     def leggi_documento(ctx: RunContext[Contesto], id_documento: str) -> str:
         """Legge un documento intero, con i numeri di riga. Identificativi da DOC-01 a DOC-11."""
-        return registra(ctx, "leggi_documento", {"id_documento": id_documento}, strumenti.leggi_documento(ctx.deps, id_documento))
+        return registra(
+            ctx, "leggi_documento", {"id_documento": id_documento}, strumenti.leggi_documento(ctx.deps, id_documento)
+        )
 
     @agente.tool(name="leggi_movimenti")
     def movimenti(ctx: RunContext[Contesto], data_iniziale: str, data_finale: str) -> str:
         """Restituisce i movimenti del conto (bonifici, addebiti, accrediti) tra due date, estremi inclusi, ognuno con la riga di origine. Date nel formato GG/MM/AAAA."""
-        return registra(ctx, "leggi_movimenti", {"data_iniziale": data_iniziale, "data_finale": data_finale}, leggi_movimenti(ctx.deps, data_iniziale, data_finale))
+        return registra(
+            ctx,
+            "leggi_movimenti",
+            {"data_iniziale": data_iniziale, "data_finale": data_finale},
+            leggi_movimenti(ctx.deps, data_iniziale, data_finale),
+        )
 
     @agente.tool(requires_approval=True)
     def invia_email(ctx: RunContext[Contesto], destinatario: str, oggetto: str, testo: str, allegati: list[str]) -> str:
         """Invia un'email. `allegati` è l'elenco degli identificativi dei documenti da allegare; può essere vuoto."""
-        return registra(ctx, "invia_email", {"destinatario": destinatario, "oggetto": oggetto, "allegati": allegati}, strumenti.invia_email(ctx.deps, destinatario, oggetto, testo, allegati))
+        return registra(
+            ctx,
+            "invia_email",
+            {"destinatario": destinatario, "oggetto": oggetto, "allegati": allegati},
+            strumenti.invia_email(ctx.deps, destinatario, oggetto, testo, allegati),
+        )
 
     return agente
 
@@ -95,11 +112,24 @@ def valuta_bozza(modello: Model | str, contesto: Contesto, destinatario: str, te
     giudice: Agent[None, Decisione] = Agent(modello, output_type=Decisione, instructions=ISTRUZIONI_GATE)
     proposta = giudice.run_sync(f"Destinatario: {destinatario}\n\nBozza:\n{testo}").output
     decisione = applica_regole(proposta, destinatario, testo, contesto.documenti)
-    contesto.traccia.scrivi("gate", esito=decisione.esito, confidenza=decisione.confidenza, fonti=decisione.fonti, motivo=decisione.motivo, proposta_del_modello=proposta.esito)
+    contesto.traccia.scrivi(
+        "gate",
+        esito=decisione.esito,
+        confidenza=decisione.confidenza,
+        fonti=decisione.fonti,
+        motivo=decisione.motivo,
+        proposta_del_modello=proposta.esito,
+    )
     return decisione
 
 
-def esegui(modello: Model | str, contesto: Contesto, richiesta: str, chiedi_alla_persona, modello_gate: Model | str | None = None) -> str:
+def esegui(
+    modello: Model | str,
+    contesto: Contesto,
+    richiesta: str,
+    chiedi_alla_persona,
+    modello_gate: Model | str | None = None,
+) -> str:
     """Porta l'agente fino in fondo. `chiedi_alla_persona(chiamata, decisione)` restituisce True, un ToolApproved o un ToolDenied."""
     agente = crea_agente(modello)
     limiti = UsageLimits(request_limit=MAX_PASSI)
@@ -109,21 +139,41 @@ def esegui(modello: Model | str, contesto: Contesto, richiesta: str, chiedi_alla
         risposte = {}
         for chiamata in risultato.output.approvals:
             argomenti = chiamata.args_as_dict()
-            decisione = valuta_bozza(modello_gate or modello, contesto, argomenti.get("destinatario", ""), argomenti.get("testo", ""))
+            decisione = valuta_bozza(
+                modello_gate or modello, contesto, argomenti.get("destinatario", ""), argomenti.get("testo", "")
+            )
             if decisione.esito == "ferma":
-                risposta, esito, deciso_da = ToolDenied(f"Il gate ha fermato l'invio: {decisione.motivo}"), "fermata dal gate", "gate"
+                risposta, esito, deciso_da = (
+                    ToolDenied(f"Il gate ha fermato l'invio: {decisione.motivo}"),
+                    "fermata dal gate",
+                    "gate",
+                )
             else:
                 risposta = chiedi_alla_persona(chiamata, decisione)
                 if isinstance(risposta, ToolApproved) and risposta.override_args:
                     argomenti = risposta.override_args
                     # La persona può cambiare il destinatario, non allargare l'elenco di quelli ammessi.
                     if argomenti.get("destinatario") not in DESTINATARI_AMMESSI:
-                        risposta = ToolDenied(f"Destinatario non in elenco: {argomenti.get('destinatario')}. L'email non è stata inviata.")
+                        risposta = ToolDenied(
+                            f"Destinatario non in elenco: {argomenti.get('destinatario')}. L'email non è stata inviata."
+                        )
                 esito = "rifiutata" if isinstance(risposta, ToolDenied) else "approvata"
                 # Chi ha deciso davvero: la persona, oppure la risposta automatica usata per ripetere un'esecuzione.
                 deciso_da = "LAB_RISPOSTA" if os.environ.get("LAB_RISPOSTA") else os.environ.get("USER", "operatore")
-            contesto.traccia.scrivi("approvazione", strumento=chiamata.tool_name, argomenti={k: v for k, v in argomenti.items() if k != "testo"}, esito=esito, deciso_da=deciso_da)
+            contesto.traccia.scrivi(
+                "approvazione",
+                strumento=chiamata.tool_name,
+                argomenti={k: v for k, v in argomenti.items() if k != "testo"},
+                esito=esito,
+                deciso_da=deciso_da,
+            )
             risposte[chiamata.tool_call_id] = risposta
-        risultato = agente.run_sync(message_history=risultato.all_messages(), deferred_tool_results=risultato.output.build_results(approvals=risposte), deps=contesto, usage_limits=limiti, usage=risultato.usage)
+        risultato = agente.run_sync(
+            message_history=risultato.all_messages(),
+            deferred_tool_results=risultato.output.build_results(approvals=risposte),
+            deps=contesto,
+            usage_limits=limiti,
+            usage=risultato.usage,
+        )
     contesto.traccia.scrivi("risposta", testo=risultato.output)
     return risultato.output

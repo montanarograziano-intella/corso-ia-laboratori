@@ -1,9 +1,9 @@
      1	DATI SINTETICI - USO DIDATTICO
      2	DOC-03 · Verbale di sommarie informazioni
      3	Commissariato di P.S. di Borgovecchio (località di fantasia) · 6 marzo 2025, ore 11:15
-     4	
+     4
      5	Persona informata sui fatti: Anna Riva, impiegata della filiale di Borgovecchio di Banca Esempio, identificata a mezzo carta d'identità.
-     6	
+     6
      7	Domanda: Quando ha incontrato la signora Neri?
      8	Risposta: Il 4 marzo. Alle 11:00 la signora è venuta in filiale.
      9	Domanda: Che cosa le ha riferito?
@@ -14,5 +14,5 @@
     14	Risposta: La signora mi ha detto di aver trasferito 2.400 euro.
     15	Domanda: Che cosa ha fatto la filiale?
     16	Risposta: Ho aperto la pratica di disconoscimento e ho chiesto il blocco delle credenziali. Il bonifico istantaneo era già accreditato e non si poteva annullare.
-    17	
+    17
     18	Letto, confermato e sottoscritto: Anna Riva. L'agente di P.G. verbalizzante.

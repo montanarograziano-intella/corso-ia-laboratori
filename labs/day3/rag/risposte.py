@@ -32,7 +32,9 @@ def leggi_env(file: Path = QUI / ".env") -> None:
     """
     if not file.exists():
         return
-    for riga in file.read_text(encoding="utf-8-sig").splitlines():  # utf-8-sig: il Blocco note di Windows aggiunge un BOM
+    for riga in file.read_text(
+        encoding="utf-8-sig"
+    ).splitlines():  # utf-8-sig: il Blocco note di Windows aggiunge un BOM
         nome, separatore, valore = riga.strip().partition("=")
         if separatore and nome and not nome.startswith("#"):
             os.environ[nome.strip()] = valore.strip().strip("\"'")
@@ -80,7 +82,7 @@ async def rispondi(domanda: str, chunk: list[tuple[str, str]], modello: str | No
 
 
 def risposta_precalcolata(numero: str, variante: str) -> tuple[str, str]:
-    """La risposta già calcolata per la domanda `numero` del banco, variante «rag» o «tutto», e da dove viene."""
+    """La risposta già calcolata per la domanda `numero` del golden dataset, variante «rag» o «tutto», e da dove viene."""
     riserva = json.loads(PRECALCOLATE.read_text(encoding="utf-8"))
     origine = f"calcolata il {riserva['data']} con {riserva['modello']}"
     risposta = riserva["risposte"].get(numero, {}).get(variante)

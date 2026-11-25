@@ -1,5 +1,4 @@
-"""Passo B: il primo strumento. L'agente può leggere un documento del fascicolo.
-"""
+"""Passo B: il primo strumento. L'agente può leggere un documento del fascicolo."""
 
 from __future__ import annotations
 
@@ -10,11 +9,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1]))
 os.environ.setdefault("PYDANTIC_AI_NO_BANNER", "1")
 
-from pydantic_ai import Agent, RunContext  # noqa: E402, F401
-from pydantic_ai.models import Model  # noqa: E402
-
-import strumenti  # noqa: E402, F401
-from strumenti import Contesto  # noqa: E402
+import strumenti
+from pydantic_ai import Agent, RunContext
+from pydantic_ai.models import Model
+from strumenti import Contesto
 
 ISTRUZIONI = """Sei un assistente che aiuta un investigatore di polizia giudiziaria a lavorare su un fascicolo.
 Prima di rispondere leggi tutti i documenti, da DOC-01 a DOC-11, uno per uno. Nella cronologia ogni evento sta su una riga che comincia con la data

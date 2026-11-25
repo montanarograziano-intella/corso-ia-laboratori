@@ -12,13 +12,24 @@ from agente_locale import con_contesto, riassumi  # noqa: F401 (con_contesto: l'
 PASSI = [
     {"documenti": ["DOC-01", "DOC-02"]},
     {"strumento": "leggi_documento", "argomenti": {"id_documento": "doc-01"}, "risultato": "1  testo"},
-    {"strumento": "leggi_documento", "argomenti": {"id_documento": "DOC-99"}, "risultato": "documento non trovato: DOC-99"},
+    {
+        "strumento": "leggi_documento",
+        "argomenti": {"id_documento": "DOC-99"},
+        "risultato": "documento non trovato: DOC-99",
+    },
 ]
 
 
 def test_un_esecuzione_riuscita() -> None:
     r = riassumi(PASSI, "", False, True, "trovato  ...\n\n8 eventi trovati su 19\n")
-    assert (r["documenti_letti"], r["documenti"], r["email_inviata"], r["eventi_trovati"], r["eventi"], r["nota"]) == (1, 2, True, 8, 19, "")
+    assert (r["documenti_letti"], r["documenti"], r["email_inviata"], r["eventi_trovati"], r["eventi"], r["nota"]) == (
+        1,
+        2,
+        True,
+        8,
+        19,
+        "",
+    )
 
 
 def test_senza_email_non_c_e_un_punteggio() -> None:
@@ -33,7 +44,10 @@ def test_tempo_scaduto_e_modello_senza_strumenti() -> None:
 
 
 def test_un_esecuzione_interrotta_riporta_il_motivo() -> None:
-    assert riassumi(PASSI, "Esecuzione interrotta: superato il limite di 25 richieste\n", False, False, "")["nota"] == "superato il limite di 25 richieste"
+    assert (
+        riassumi(PASSI, "Esecuzione interrotta: superato il limite di 25 richieste\n", False, False, "")["nota"]
+        == "superato il limite di 25 richieste"
+    )
 
 
 def test_un_punteggio_che_non_si_legge_non_diventa_zero() -> None:

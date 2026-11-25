@@ -1,6 +1,6 @@
 # Notebook RAG: vettoriale o ibrida?
 
-Giorno 3, pomeriggio, slide 132 (il banco di prova è presentato nella 131). 50 minuti, ognuno al proprio portatile.
+Giorno 3, pomeriggio, slide 115 (il golden dataset è presentato nella 114).
 
 Si cerca nel fascicolo in tre modi (parole chiave, vettoriale, ibrida), si misura quale trova il chunk giusto su
 quindici domande, poi un modello risponde citando le fonti. Tutti i dati sono sintetici.
@@ -38,9 +38,9 @@ viene tagliato senza avviso.
 | `notebook.ipynb` | Il notebook, in quattro parti: archivio, tre ricerche, risposta con le fonti, tabella |
 | `rag.py` | I chunk del corpus e le tre ricerche |
 | `risposte.py` | Il prompt con le fonti e la chiamata al modello |
-| `banco.csv` | Le quindici domande, ciascuna con il chunk in cui sta la risposta |
+| `golden_dataset.csv` | Le quindici domande, ciascuna con il chunk in cui sta la risposta |
 | `distrattori/` | Cinque documenti di un'altra frode, con altri nomi, date, importi e IBAN |
-| `prova_banco.py` | La tabella delle tre ricerche, dal terminale: `uv run prova_banco.py --k 5` |
+| `prova_golden_dataset.py` | La tabella delle tre ricerche, dal terminale: `uv run prova_golden_dataset.py --k 5` |
 | `precalcola.py` | Ricalcola le risposte di riserva con il modello scritto in `.env` |
 
 ## Il corpus
@@ -55,7 +55,7 @@ fanno parte del fascicolo dell'hackathon, e la banca e la località non compaion
 
 È una trappola voluta. Le domande non nominano la vittima e un chunk è una riga sola, che non dice di quale caso
 parla: per le domande 9 e 12-15 anche l'altra frode ha una riga che «risponde». Per la 15, il primo bonifico
-dell'altra persona è del 17/02/2025, e nei chunk dati al modello entra l'estratto conto DOC-52. Il banco conta giusto
+dell'altra persona è del 17/02/2025, e nei chunk dati al modello entra l'estratto conto DOC-52. Il golden dataset conta giusto
 solo il chunk del nostro caso. Nella parte 3 una risposta può citare una fonte che esiste e parlare del caso
 sbagliato: è il punto da far notare, e si vede aprendo il documento citato.
 

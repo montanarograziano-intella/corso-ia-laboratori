@@ -15,9 +15,8 @@ import json
 import sys
 from pathlib import Path
 
-from mlx_lm import generate, load
-
 from genera import ISTRUZIONE
+from mlx_lm import generate, load
 
 QUI = Path(__file__).resolve().parent
 DOC_01 = QUI.parents[2] / "data" / "case-file" / "core" / "DOC-01-denuncia-neri.txt"
@@ -116,7 +115,9 @@ def main() -> None:
             "giusti_per_campo": per_campo,
             "esempi": risposte,
         }
-        print(variante, f"{giusti}/{totale} campi, {schede_complete}/{len(casi) - 1} schede, DOC-01:", risposte["DOC-01"])
+        print(
+            variante, f"{giusti}/{totale} campi, {schede_complete}/{len(casi) - 1} schede, DOC-01:", risposte["DOC-01"]
+        )
         del modello
 
     Path(uscita).write_text(json.dumps(risultati, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

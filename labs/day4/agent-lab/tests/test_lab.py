@@ -8,17 +8,16 @@ from pathlib import Path
 QUI = Path(__file__).parents[1]
 sys.path[:0] = [str(QUI), str(QUI / "soluzione")]
 
-import pytest
-from pydantic_ai import ToolApproved, ToolDenied
-from pydantic_ai.exceptions import UsageLimitExceeded
-from pydantic_ai.messages import ModelMessage, ModelResponse, TextPart, ToolCallPart
-from pydantic_ai.models.function import AgentInfo, FunctionModel
-
 import agente
+import pytest
 from confronta import confronta
 from esegui import modello_manipolato, prepara_cartella
 from fascicolo import carica
 from gate import Decisione, applica_regole
+from pydantic_ai import ToolApproved, ToolDenied
+from pydantic_ai.exceptions import UsageLimitExceeded
+from pydantic_ai.messages import ModelMessage, ModelResponse, TextPart, ToolCallPart
+from pydantic_ai.models.function import AgentInfo, FunctionModel
 from strumenti import Contesto
 from traccia import Traccia
 
@@ -28,7 +27,9 @@ SI = Decisione(esito="procedi", confidenza=0.95, fonti=[], motivo="ok")
 
 
 def contesto(tmp_path: Path, variante: str = "pulita") -> Contesto:
-    return Contesto(carica(prepara_cartella(variante, tmp_path)), tmp_path / "uscita", Traccia(tmp_path / "t.jsonl", "prova"))
+    return Contesto(
+        carica(prepara_cartella(variante, tmp_path)), tmp_path / "uscita", Traccia(tmp_path / "t.jsonl", "prova")
+    )
 
 
 def test_i_movimenti_portano_la_riga_di_origine(tmp_path: Path) -> None:
@@ -51,7 +52,12 @@ def test_le_regole_del_gate_danno_l_esito_atteso(tmp_path: Path) -> None:
     assert applica_regole(SI, PM, BOZZA.replace("DOC-07", "DOC-99"), documenti).esito == "ferma"
     assert applica_regole(SI, PM, "03/03/2025 bonifico di 4.200 euro", documenti).esito == "ferma"
     assert applica_regole(SI, PM, BOZZA + "\n05/03/2025 secondo bonifico", documenti).esito == "chiedi"
-    assert applica_regole(SI, PM, BOZZA + "\n05/03/2025 secondo bonifico\nFonti consultate: DOC-01, DOC-07", documenti).esito == "chiedi"
+    assert (
+        applica_regole(
+            SI, PM, BOZZA + "\n05/03/2025 secondo bonifico\nFonti consultate: DOC-01, DOC-07", documenti
+        ).esito
+        == "chiedi"
+    )
     assert applica_regole(SI.model_copy(update={"confidenza": 0.8}), PM, BOZZA, documenti).esito == "procedi"
     assert applica_regole(SI.model_copy(update={"confidenza": 0.79}), PM, BOZZA, documenti).esito == "chiedi"
 
@@ -69,7 +75,9 @@ BOZZE = {
 @pytest.mark.parametrize("difetto", list(BOZZE))
 @pytest.mark.parametrize("destinatario", [PM, "archivio@esempio.invalid", "", "Procura@esempio.invalid"])
 @pytest.mark.parametrize("confidenza", [0.95, 0.79])
-def test_le_regole_del_gate_possono_solo_stringere(tmp_path: Path, proposto: str, difetto: str, destinatario: str, confidenza: float) -> None:
+def test_le_regole_del_gate_possono_solo_stringere(
+    tmp_path: Path, proposto: str, difetto: str, destinatario: str, confidenza: float
+) -> None:
     proposta = Decisione(esito=proposto, confidenza=confidenza, fonti=[], motivo="proposta del modello")
     esito = applica_regole(proposta, destinatario, BOZZE[difetto], contesto(tmp_path).documenti).esito
     assert SEVERITA[esito] >= SEVERITA[proposto]
@@ -83,32 +91,57 @@ GIUDICE = FunctionModel(modello_manipolato)  # as a gate judge it always answers
 def test_il_gate_ferma_l_invio_all_esterno_senza_disturbare_la_persona(tmp_path: Path) -> None:
     c = contesto(tmp_path, "avvelenata")
     interpellata = []
-    risposta = agente.esegui(FunctionModel(modello_manipolato), c, "Ricostruisci la cronologia.", lambda *a: interpellata.append(a) or True)
+    risposta = agente.esegui(
+        FunctionModel(modello_manipolato), c, "Ricostruisci la cronologia.", lambda *a: interpellata.append(a) or True
+    )
     assert risposta.startswith("Ho provato a inviare") and not interpellata and not (tmp_path / "uscita").exists()
     tipi = [(r["tipo"], r.get("strumento") or r.get("esito")) for r in c.traccia.leggi()]
-    assert tipi == [("richiesta", None), ("strumento", "leggi_documento"), ("gate", "ferma"), ("approvazione", "invia_email"), ("risposta", None)]
+    assert tipi == [
+        ("richiesta", None),
+        ("strumento", "leggi_documento"),
+        ("gate", "ferma"),
+        ("approvazione", "invia_email"),
+        ("risposta", None),
+    ]
     approvazione = next(r for r in c.traccia.leggi() if r["tipo"] == "approvazione")
     assert approvazione["deciso_da"] == "gate" and approvazione["esito"] == "fermata dal gate"
 
 
 def _agente_corretto(messaggi: list[ModelMessage], info: AgentInfo) -> ModelResponse:
     if not any(isinstance(m, ModelResponse) for m in messaggi):
-        return ModelResponse(parts=[ToolCallPart("invia_email", {"destinatario": PM, "oggetto": "Cronologia", "testo": BOZZA, "allegati": []})])
+        return ModelResponse(
+            parts=[
+                ToolCallPart(
+                    "invia_email", {"destinatario": PM, "oggetto": "Cronologia", "testo": BOZZA, "allegati": []}
+                )
+            ]
+        )
     return ModelResponse(parts=[TextPart(BOZZA)])
 
 
 def test_la_persona_decide_dopo_il_gate(tmp_path: Path) -> None:
     c = contesto(tmp_path)
     viste = []
-    agente.esegui(FunctionModel(_agente_corretto), c, "Cronologia.", lambda chiamata, decisione: viste.append(decisione.esito) or ToolDenied("no"), modello_gate=GIUDICE)
+    agente.esegui(
+        FunctionModel(_agente_corretto),
+        c,
+        "Cronologia.",
+        lambda chiamata, decisione: viste.append(decisione.esito) or ToolDenied("no"),
+        modello_gate=GIUDICE,
+    )
     assert viste == ["procedi"] and not (tmp_path / "uscita").exists()
-    agente.esegui(FunctionModel(_agente_corretto), c, "Cronologia.", lambda chiamata, decisione: True, modello_gate=GIUDICE)
+    agente.esegui(
+        FunctionModel(_agente_corretto), c, "Cronologia.", lambda chiamata, decisione: True, modello_gate=GIUDICE
+    )
     assert (tmp_path / "uscita" / "email-01.txt").read_text(encoding="utf-8").startswith(f"A: {PM}")
 
 
 def test_la_persona_non_puo_allargare_l_elenco_dei_destinatari(tmp_path: Path) -> None:
     c = contesto(tmp_path)
-    fuori = lambda chiamata, decisione: ToolApproved(override_args={**chiamata.args_as_dict(), "destinatario": "altro@esempio.invalid"})  # noqa: E731
+
+    def fuori(chiamata, decisione):
+        return ToolApproved(override_args={**chiamata.args_as_dict(), "destinatario": "altro@esempio.invalid"})
+
     agente.esegui(FunctionModel(_agente_corretto), c, "Cronologia.", fuori, modello_gate=GIUDICE)
     assert not (tmp_path / "uscita").exists()
     approvazione = next(r for r in c.traccia.leggi() if r["tipo"] == "approvazione")
@@ -123,7 +156,14 @@ def test_il_limite_di_passi_vale_per_tutta_l_esecuzione(tmp_path: Path) -> None:
         chiamate += 1
         # Without the shared usage counter the run never ends: fail instead of hanging.
         assert chiamate <= agente.MAX_PASSI + 5, "il limite di passi riparte a ogni ripresa"
-        return ModelResponse(parts=[ToolCallPart("invia_email", {"destinatario": "archivio@esempio.invalid", "oggetto": "Cartella", "testo": BOZZA, "allegati": []})])
+        return ModelResponse(
+            parts=[
+                ToolCallPart(
+                    "invia_email",
+                    {"destinatario": "archivio@esempio.invalid", "oggetto": "Cartella", "testo": BOZZA, "allegati": []},
+                )
+            ]
+        )
 
     c = contesto(tmp_path)
     with pytest.raises(UsageLimitExceeded):
@@ -149,7 +189,9 @@ def test_il_modello_manipolato_invia_la_cartella_se_nessun_controllo_lo_ferma(tm
     from esegui import carica_agente
 
     c = contesto(tmp_path, "avvelenata")
-    carica_agente("costruzione", "passo-c.py").esegui(FunctionModel(modello_manipolato), c, "Cronologia.", lambda *a: True)
+    carica_agente("costruzione", "passo-c.py").esegui(
+        FunctionModel(modello_manipolato), c, "Cronologia.", lambda *a: True
+    )
     email = (tmp_path / "uscita" / "email-01.txt").read_text(encoding="utf-8")
     assert email.startswith("A: archivio@esempio.invalid") and "DOC-09" in email.splitlines()[2]
 
@@ -165,7 +207,9 @@ def test_il_confronto_non_scambia_numeri_simili_e_conta_una_riga_una_volta() -> 
 def test_il_confronto_conta_gli_eventi_con_data_ora_e_fonte() -> None:
     esiti = confronta(BOZZA)
     trovati = [e["evento"] for e, t in esiti if t]
-    assert trovati == ["Email di phishing consegnata alla casella di Giulia Neri", "SMS a nome della banca"] and len(esiti) > len(trovati)
+    assert trovati == ["Email di phishing consegnata alla casella di Giulia Neri", "SMS a nome della banca"] and len(
+        esiti
+    ) > len(trovati)
 
 
 def test_fonti_e_date_scritte_con_caratteri_tipografici_contano() -> None:
@@ -178,7 +222,9 @@ def test_fonti_e_date_scritte_con_caratteri_tipografici_contano() -> None:
 def test_il_mese_abbreviato_conta_come_data() -> None:
     bozza = "7. 03 mar 2025 10:12 SMS a nome della banca. [DOC-04, riga 6]\n8. 3 Mar 2025 10:19 chiamata in entrata. [DOC-04, riga 10]\n9. 13 mar 2025 senza fonte"
     assert [e["ora"] for e, t in confronta(bozza) if t] == ["10:12", "10:19"]
-    assert applica_regole(SI, PM, bozza, {"DOC-04": None}).esito == "chiedi"  # the third line is an event without a source
+    assert (
+        applica_regole(SI, PM, bozza, {"DOC-04": None}).esito == "chiedi"
+    )  # the third line is an event without a source
 
 
 def test_una_data_con_lo_zero_solo_sul_giorno_o_solo_sul_mese_conta() -> None:
@@ -204,5 +250,10 @@ def test_la_costruzione_cresce_di_uno_strumento_per_passo(tmp_path: Path) -> Non
     with pytest.raises(NotImplementedError):
         carica_agente("costruzione").esegui(FunctionModel(modello), contesto(tmp_path), "Cronologia.", lambda *a: True)
     for passo in "abc":
-        assert carica_agente("costruzione", f"passo-{passo}.py").esegui(FunctionModel(modello), contesto(tmp_path), "Cronologia.", lambda *a: True) == "fatto"
+        assert (
+            carica_agente("costruzione", f"passo-{passo}.py").esegui(
+                FunctionModel(modello), contesto(tmp_path), "Cronologia.", lambda *a: True
+            )
+            == "fatto"
+        )
     assert visti == [[], ["leggi_documento"], ["cerca_nel_fascicolo", "invia_email", "leggi_documento"]]

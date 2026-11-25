@@ -12,16 +12,21 @@ from dataclasses import dataclass
 from html.parser import HTMLParser
 from pathlib import Path
 
-TIPOGRAFICI = str.maketrans({**dict.fromkeys("\u2010\u2011\u2012\u2013\u2212", "-"), **dict.fromkeys("\u00a0\u2009\u202f", " ")})
+TIPOGRAFICI = str.maketrans(
+    {**dict.fromkeys("\u2010\u2011\u2012\u2013\u2212", "-"), **dict.fromkeys("\u00a0\u2009\u202f", " ")}
+)
 
 
 def testo_semplice(testo: str) -> str:
-    """Models write DOC‑05 and «3 marzo» with typographic hyphens and narrow spaces: make them plain before matching."""
+    """Models write DOC‑05 and «3 marzo» with typographic hyphens and narrow spaces: make them plain before matching."""  # noqa: RUF002 (the example is the point)
     return testo.translate(TIPOGRAFICI)
 
 
 # Una data come 03/03/2025, 2025-03-03, 3 marzo oppure 3 mar: i modelli scrivono spesso il mese abbreviato.
-DATA = re.compile(r"\b(\d{1,2}/\d{1,2}/\d{4}|\d{4}-\d{2}-\d{2}|\d{1,2} (?:gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)[a-z]*)\b", re.IGNORECASE)
+DATA = re.compile(
+    r"\b(\d{1,2}/\d{1,2}/\d{4}|\d{4}-\d{2}-\d{2}|\d{1,2} (?:gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)[a-z]*)\b",
+    re.IGNORECASE,
+)
 
 
 FONTE_CON_RIGA = re.compile(r"DOC-\d+\W{0,3}rig")
@@ -49,7 +54,29 @@ def eventi(testo: str) -> list[str]:
 
 ID = re.compile(r"^(DOC-\d+)")
 WORD = re.compile(r"[a-zà-ù0-9@.:]+", re.IGNORECASE)
-STOP = {"il", "lo", "la", "i", "gli", "le", "un", "una", "di", "a", "da", "in", "con", "su", "per", "e", "che", "del", "della", "è", "al"}
+STOP = {
+    "il",
+    "lo",
+    "la",
+    "i",
+    "gli",
+    "le",
+    "un",
+    "una",
+    "di",
+    "a",
+    "da",
+    "in",
+    "con",
+    "su",
+    "per",
+    "e",
+    "che",
+    "del",
+    "della",
+    "è",
+    "al",
+}
 
 
 class _Text(HTMLParser):

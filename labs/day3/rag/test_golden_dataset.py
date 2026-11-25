@@ -5,9 +5,8 @@ import os
 from pathlib import Path
 
 import pytest
-
-from rag import DISTRATTORI, FASCICOLO, estrai_parole_significative, chunk_del_corpus, trovato
-from risposte import leggi_env, costruisci_prompt
+from rag import DISTRATTORI, FASCICOLO, chunk_del_corpus, estrai_parole_significative, trovato
+from risposte import costruisci_prompt, leggi_env
 
 
 def test_un_chunk_tra_alternative() -> None:
@@ -38,10 +37,10 @@ def test_il_corpus_ha_i_chunk_attesi() -> None:
 def test_ogni_chunk_atteso_del_banco_esiste() -> None:
     # A question whose expected passage is not in the corpus could never be found: the table would be wrong by design.
     chunk = dict(chunk_del_corpus())
-    with (Path(__file__).parent / "banco.csv").open(encoding="utf-8") as file:
-        banco = list(csv.DictReader(file))
-    assert len(banco) == 15
-    for domanda in banco:
+    with (Path(__file__).parent / "golden_dataset.csv").open(encoding="utf-8") as file:
+        golden_dataset = list(csv.DictReader(file))
+    assert len(golden_dataset) == 15
+    for domanda in golden_dataset:
         for riferimento in domanda["chunk_attesi"].replace("&", "|").split("|"):
             assert not riferimento.strip() or riferimento.strip() in chunk, (domanda["n"], riferimento)
 

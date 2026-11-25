@@ -9,9 +9,8 @@ from __future__ import annotations
 import re
 from typing import Literal
 
-from pydantic import BaseModel, Field
-
 from fascicolo import Documento, eventi, testo_semplice
+from pydantic import BaseModel, Field
 
 SOGLIA = 0.8
 DESTINATARI_AMMESSI = {"procura@esempio.invalid"}

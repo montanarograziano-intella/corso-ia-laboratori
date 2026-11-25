@@ -33,5 +33,8 @@ def invia_email(contesto: Contesto, destinatario: str, oggetto: str, testo: str,
     contesto.posta_in_uscita.mkdir(parents=True, exist_ok=True)
     numero = len(list(contesto.posta_in_uscita.glob("*.txt"))) + 1
     file = contesto.posta_in_uscita / f"email-{numero:02d}.txt"
-    file.write_text(f"A: {destinatario}\nOggetto: {oggetto}\nAllegati: {', '.join(allegati) or 'nessuno'}\n\n{testo}\n", encoding="utf-8")
+    file.write_text(
+        f"A: {destinatario}\nOggetto: {oggetto}\nAllegati: {', '.join(allegati) or 'nessuno'}\n\n{testo}\n",
+        encoding="utf-8",
+    )
     return f"email scritta nella posta in uscita: {file.name}"

@@ -131,8 +131,7 @@ INTESTAZIONI = [
     "che dichiara:",
     "DENUNCIA-QUERELA\nUfficio denunce di {luogo} (località di fantasia), {data_lunga}\nIl giorno sopra "
     "indicato si presenta {nome} {cognome}, che espone quanto segue.",
-    "Verbale di denuncia sporta da {nome} {cognome}\n{luogo} (località di fantasia), {data_lunga} alle "
-    "{ora_verbale}",
+    "Verbale di denuncia sporta da {nome} {cognome}\n{luogo} (località di fantasia), {data_lunga} alle {ora_verbale}",
 ]
 CHIUSURE = [
     "Chiedo che si proceda nei confronti dei responsabili.\nLetto, confermato e sottoscritto.",
@@ -173,9 +172,7 @@ def un_esempio(caso: random.Random) -> dict:
         ora=ora, importo=importo_testo(valore, caso), strumento_testo=caso.choice(STRUMENTO_TESTO[strumento])
     )
     quando = (
-        f"I fatti sono di oggi, {data_lunga(fatto)}."
-        if ritardo == 0
-        else f"I fatti risalgono al {data_lunga(fatto)}."
+        f"I fatti sono di oggi, {data_lunga(fatto)}." if ritardo == 0 else f"I fatti risalgono al {data_lunga(fatto)}."
     )
     righe = [
         caso.choice(INTESTAZIONI).format(
