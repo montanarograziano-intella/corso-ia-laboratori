@@ -53,7 +53,7 @@ LICENZE = {
     5: ("CC BY-SA 2.0", "https://creativecommons.org/licenses/by-sa/2.0/"),
 }
 # Scelte a mano tra le foto di validazione COCO con licenza CC BY o CC BY-SA e almeno due veicoli: strade e
-# parcheggi, persone lontane. Di notte ce ne sono solo cinque: è il punto della slide 43.
+# parcheggi, persone lontane. Di notte ce ne sono solo cinque: è il punto della slide 41.
 GIORNO = [
     423617,
     429109,

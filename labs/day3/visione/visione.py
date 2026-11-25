@@ -32,19 +32,19 @@ SOGLIE = (0.3, 0.5, 0.7)
 IOU_MINIMA = 0.5  # la soglia di IoU: un riquadro previsto è giusto se la parte in comune è almeno metà dell'unione
 SOGLIA_INCERTO = 0.9
 
-Riquadro = tuple[float, float, float, float]
+Riquadro = tuple[float, float, float, float]  # in pixel: sinistra, alto, destra, basso
 
 # PyTorch avvisa su macOS che una funzione che il notebook non usa manca: il livello lo reimposta lui, va spento.
 logging.getLogger("torch.distributed.elastic.multiprocessing.redirects").disabled = True
 
 
-def _carica(classe, nome: str, **opzioni):
+def _carica_modello(classe, nome: str, **opzioni):
     """Dalla cartella `.modelli/` senza rete, se il modello c'è già; altrimenti lo scarica, una volta."""
-    from transformers.utils import logging as registro
+    from transformers.utils import logging as transformers_logging
 
     # Avvisi di configurazione e barre di avanzamento non dicono niente a chi usa i modelli.
-    registro.set_verbosity_error()
-    registro.disable_progress_bar()
+    transformers_logging.set_verbosity_error()
+    transformers_logging.disable_progress_bar()
     try:
         return classe.from_pretrained(nome, cache_dir=MODELLI, local_files_only=True, **opzioni)
     except OSError:
@@ -52,6 +52,7 @@ def _carica(classe, nome: str, **opzioni):
 
 
 def _leggi_csv(nome: str) -> list[dict[str, str]]:
+    """Le righe di un file CSV di `dati/`, ognuna come dizionario colonna → valore."""
     percorso = DATI / nome
     if not percorso.exists():
         raise FileNotFoundError(f"manca {percorso}: il laboratorio va aperto dentro il repository intero")
@@ -59,7 +60,8 @@ def _leggi_csv(nome: str) -> list[dict[str, str]]:
         return list(csv.DictReader(file))
 
 
-def _riquadro(riga: dict[str, str]) -> Riquadro:
+def _riquadro_dalla_riga(riga: dict[str, str]) -> Riquadro:
+    """Il riquadro scritto nelle colonne x0, y0, x1, y1 di una riga CSV."""
     return float(riga["x0"]), float(riga["y0"]), float(riga["x1"]), float(riga["y1"])
 
 
@@ -75,11 +77,12 @@ def veicoli_veri() -> dict[str, list[Riquadro]]:
     """I riquadri disegnati da persone (le annotazioni COCO): auto, camion e autobus, per fotogramma."""
     veri: dict[str, list[Riquadro]] = {file: [] for file in fotogrammi()}
     for riga in _leggi_csv("veicoli.csv"):
-        veri[riga["file"]].append(_riquadro(riga))
+        veri[riga["file"]].append(_riquadro_dalla_riga(riga))
     return veri
 
 
-def apri(file: str) -> Image.Image:
+def apri_immagine(file: str) -> Image.Image:
+    """Un fotogramma (F…), una foto di targa (T…) o una scansione, dal nome del file."""
     cartella = "fotogrammi" if file.startswith("F") else "targhe" if file.startswith("T") else "scansioni"
     return Image.open(DATI / cartella / file).convert("RGB")
 
@@ -91,15 +94,15 @@ def anteprima(immagine: Image.Image, larghezza: int = 640) -> Image.Image:
     return copia
 
 
-def striscia(file: list[str], altezza: int = 140) -> Image.Image:
-    """I fotogrammi in fila, nell'ordine dato."""
-    immagini = [apri(nome) for nome in file]
+def affianca_fotogrammi(file: list[str], altezza: int = 140) -> Image.Image:
+    """I fotogrammi in fila, nell'ordine dato, tutti alla stessa altezza."""
+    immagini = [apri_immagine(nome) for nome in file]
     immagini = [im.resize((im.width * altezza // im.height, altezza)) for im in immagini]
     fila = Image.new("RGB", (sum(im.width + 6 for im in immagini), altezza), "white")
     x = 0
     for im in immagini:
         fila.paste(im, (x, 0))
-        x += im.width + 6
+        x += im.width + 6  # 6 pixel bianchi tra un fotogramma e l'altro
     return fila
 
 
@@ -112,16 +115,18 @@ class ModelloDiRilevamento:
     def __init__(self) -> None:
         from transformers import AutoImageProcessor, AutoModelForObjectDetection
 
-        self.preparatore = _carica(AutoImageProcessor, RILEVATORE)
-        self.modello = _carica(AutoModelForObjectDetection, RILEVATORE).eval()
+        self.preparatore = _carica_modello(AutoImageProcessor, RILEVATORE)
+        self.modello = _carica_modello(AutoModelForObjectDetection, RILEVATORE).eval()
 
     def __call__(self, file: str, punteggio_minimo: float = min(SOGLIE)) -> list[tuple[Riquadro, float]]:
-        immagine = apri(file)
+        """I veicoli trovati nel fotogramma con punteggio da `punteggio_minimo` in su: (riquadro, punteggio)."""
+        immagine = apri_immagine(file)
         with torch.inference_mode():
             uscita = self.modello(**self.preparatore(images=immagine, return_tensors="pt"))
         trovati = self.preparatore.post_process_object_detection(
             uscita, threshold=punteggio_minimo, target_sizes=[immagine.size[::-1]]
         )[0]
+        # Il modello trova tutte le 80 classi di COCO: si tengono solo auto, camion e autobus.
         return [
             (tuple(round(v, 1) for v in riquadro.tolist()), round(float(punteggio), 3))
             for riquadro, punteggio, classe in zip(trovati["boxes"], trovati["scores"], trovati["labels"])
@@ -138,48 +143,66 @@ def iou(a: Riquadro, b: Riquadro) -> float:
     return comune / unione if unione > 0 else 0.0
 
 
-def confronta(previsti: list[tuple[Riquadro, float]], veri: list[Riquadro], soglia: float) -> dict[str, list]:
+def classifica_riquadri(previsti: list[tuple[Riquadro, float]], veri: list[Riquadro], soglia: float) -> dict[str, list]:
     """TP, FP e FN sopra la soglia. Dal punteggio più alto, ogni riquadro prende il vero libero più simile."""
-    liberi = list(veri)
-    esito: dict[str, list] = {"TP": [], "FP": [], "FN": []}
+    veri_liberi = list(veri)
+    esiti: dict[str, list] = {"TP": [], "FP": [], "FN": []}
     for riquadro, punteggio in sorted(previsti, key=lambda p: -p[1]):
         if punteggio < soglia:
             continue
-        migliore = max(liberi, key=lambda vero: iou(riquadro, vero), default=None)
+        migliore = max(veri_liberi, key=lambda vero: iou(riquadro, vero), default=None)
         if migliore is not None and iou(riquadro, migliore) >= IOU_MINIMA:
-            liberi.remove(migliore)
-            esito["TP"].append(riquadro)
+            # Un veicolo vero conta una volta sola: un secondo riquadro sullo stesso veicolo è un FP.
+            veri_liberi.remove(migliore)
+            esiti["TP"].append(riquadro)
         else:
-            esito["FP"].append(riquadro)
-    esito["FN"] = liberi
-    return esito
+            esiti["FP"].append(riquadro)
+    esiti["FN"] = veri_liberi
+    return esiti
 
 
-def misura(
+def misura_rilevamento(
     rilevamenti: dict[str, list], veri: dict[str, list[Riquadro]], soglia: float, file: list[str] | None = None
 ) -> dict[str, float]:
-    """Precisione e recall su un gruppo di fotogrammi (tutti, se `file` manca)."""
-    conti = {"fotogrammi": 0, "oggetti": 0, "TP": 0, "FP": 0, "FN": 0}
+    """Conteggi, precisione e recall su un gruppo di fotogrammi (tutti, se `file` manca)."""
+    conteggi = {"fotogrammi": 0, "veicoli": 0, "TP": 0, "FP": 0, "FN": 0}
     for nome in file if file is not None else list(veri):
-        esito = confronta(rilevamenti[nome], veri[nome], soglia)
-        conti["fotogrammi"] += 1
-        conti["oggetti"] += len(veri[nome])
+        esiti = classifica_riquadri(rilevamenti[nome], veri[nome], soglia)
+        conteggi["fotogrammi"] += 1
+        conteggi["veicoli"] += len(veri[nome])
         for chiave in ("TP", "FP", "FN"):
-            conti[chiave] += len(esito[chiave])
-    allarmi = conti["TP"] + conti["FP"]
-    conti["precisione"] = conti["TP"] / allarmi if allarmi else float("nan")
-    conti["recall"] = conti["TP"] / conti["oggetti"] if conti["oggetti"] else float("nan")
-    return conti
+            conteggi[chiave] += len(esiti[chiave])
+    allarmi = conteggi["TP"] + conteggi["FP"]
+    conteggi["precisione"] = conteggi["TP"] / allarmi if allarmi else float("nan")
+    conteggi["recall"] = conteggi["TP"] / conteggi["veicoli"] if conteggi["veicoli"] else float("nan")
+    return conteggi
 
 
-def disegna(file: str, previsti: list[tuple[Riquadro, float]], veri: list[Riquadro], soglia: float) -> Image.Image:
+def _contorna(immagine: Image.Image, riquadro: Riquadro, colore: str) -> None:
+    """Un contorno sottile appena fuori dal riquadro, per non coprire gli oggetti piccoli."""
+    spessore = max(immagine.size) // 320  # 2 pixel su una foto di 640, 6 su una ingrandita tre volte
+    x0, y0, x1, y1 = riquadro
+    fuori = (x0 - spessore, y0 - spessore, x1 + spessore, y1 + spessore)
+    ImageDraw.Draw(immagine).rectangle(fuori, outline=colore, width=spessore)
+
+
+def disegna_riquadri(file: str, riquadri: list[Riquadro]) -> Image.Image:
+    """I riquadri veri in blu, prima di qualunque modello."""
+    immagine = apri_immagine(file)
+    for riquadro in riquadri:
+        _contorna(immagine, riquadro, "#2979ff")
+    return immagine
+
+
+def disegna_esiti(
+    file: str, previsti: list[tuple[Riquadro, float]], veri: list[Riquadro], soglia: float
+) -> Image.Image:
     """Verde: TP, il veicolo trovato. Rosso: FP, un falso allarme. Giallo: FN, il veicolo vero non trovato."""
-    immagine = apri(file)
-    disegno = ImageDraw.Draw(immagine)
-    esito = confronta(previsti, veri, soglia)
+    immagine = apri_immagine(file)
+    esiti = classifica_riquadri(previsti, veri, soglia)
     for chiave, colore in (("TP", "#00c853"), ("FP", "#ff1744"), ("FN", "#ffd600")):
-        for riquadro in esito[chiave]:
-            disegno.rectangle(riquadro, outline=colore, width=4)
+        for riquadro in esiti[chiave]:
+            _contorna(immagine, riquadro, colore)
     return immagine
 
 
@@ -188,6 +211,8 @@ def disegna(file: str, previsti: list[tuple[Riquadro, float]], veri: list[Riquad
 
 @dataclass(slots=True)
 class Parola:
+    """Una parola letta dall'OCR, con la sua posizione sulla pagina (in frazioni di pagina, da 0 a 1)."""
+
     testo: str
     confidenze: list[float]  # una per carattere
     centro_y: float
@@ -201,7 +226,7 @@ class _Confidenza(float):
     per_carattere: list[float]
 
 
-class Lettore:
+class LettoreOCR:
     """OCR in due passi (docTR): trova le zone di testo, poi le legge carattere per carattere.
 
     Il lettore (CRNN con CTC) dà a ogni passo una probabilità per ogni carattere; la confidenza di un carattere è la
@@ -213,12 +238,15 @@ class Lettore:
         from doctr.models import ocr_predictor
         from doctr.models.recognition.crnn.pytorch import CTCPostProcessor
 
-        class ConPerCarattere(CTCPostProcessor):
+        class CTCConConfidenzaPerCarattere(CTCPostProcessor):
+            """Il post-processore di docTR che, oltre alla parola, tiene la confidenza di ogni carattere."""
+
             def __call__(self, logit: torch.Tensor) -> list[tuple[str, float]]:
                 probabilita, indici = logit.softmax(-1).max(-1)
                 parole = []
                 for passi, prob in zip(indici.tolist(), probabilita.tolist()):
                     caratteri, confidenze = [], []
+                    # I passi consecutivi con lo stesso indice scrivono un carattere solo.
                     for indice, gruppo in groupby(zip(passi, prob), key=lambda passo: passo[0]):
                         if indice != len(self.vocab):  # l'ultimo indice è il «vuoto» del CTC
                             caratteri.append(self.vocab[indice])
@@ -230,7 +258,7 @@ class Lettore:
 
         self.ocr = ocr_predictor(pretrained=True)
         modello = self.ocr.reco_predictor.model
-        modello.postprocessor = ConPerCarattere(modello.vocab)
+        modello.postprocessor = CTCConConfidenzaPerCarattere(modello.vocab)
 
     def __call__(self, percorso: Path | str) -> list[list[Parola]]:
         """Le righe lette, dall'alto in basso, ognuna da sinistra a destra."""
@@ -244,6 +272,7 @@ class Lettore:
                     if confidenze is None or len(confidenze) != len(parola.value):  # parola spezzata e ricomposta
                         confidenze = [float(parola.confidence)] * len(parola.value)
                     parole.append(Parola(parola.value, confidenze, (y0 + y1) / 2, x0, y1 - y0))
+        # docTR divide la pagina in blocchi: si ricompongono le righe della pagina dall'altezza delle parole.
         righe: list[list[Parola]] = []
         for parola in sorted(parole, key=lambda p: p.centro_y):
             ultima = righe[-1][-1] if righe else None
@@ -254,7 +283,7 @@ class Lettore:
         return [sorted(riga, key=lambda p: p.x0) for riga in righe]
 
 
-def testo(righe: list[list[Parola]], soglia: float | None = None) -> str:
+def testo_letto(righe: list[list[Parola]], soglia: float | None = None) -> str:
     """Il testo letto. Con una soglia, i caratteri incerti stanno tra parentesi quadre: «9[0]9»."""
 
     def scrivi(parola: Parola) -> str:
@@ -265,8 +294,8 @@ def testo(righe: list[list[Parola]], soglia: float | None = None) -> str:
     return "\n".join(" ".join(scrivi(parola) for parola in riga) for riga in righe)
 
 
-def _distanza(a: str, b: str) -> int:
-    """Quanti caratteri cambiare, aggiungere o togliere per passare da `a` a `b` (Levenshtein)."""
+def _distanza_di_levenshtein(a: str, b: str) -> int:
+    """Quanti caratteri cambiare, aggiungere o togliere per passare da `a` a `b`."""
     precedente = list(range(len(b) + 1))
     for i, ca in enumerate(a, 1):
         corrente = [i]
@@ -279,38 +308,40 @@ def _distanza(a: str, b: str) -> int:
 def cer(letto: str, vero: str) -> float:
     """Il tasso di errore sui caratteri: sostituiti, cancellati e inseriti, diviso i caratteri veri."""
     letto, vero = " ".join(letto.split()), " ".join(vero.split())
-    return _distanza(letto, vero) / len(vero)
+    return _distanza_di_levenshtein(letto, vero) / len(vero)
 
 
-def iban_letto(letto: str, iban_vero: str) -> str:
+def iban_piu_simile(letto: str, iban_vero: str) -> str:
     """Il pezzo del testo letto, spazi tolti, che somiglia di più all'IBAN vero. Può avere qualche carattere in più
     o in meno: l'OCR a volte ne aggiunge o ne perde uno."""
     compatto, cercato = re.sub(r"\s", "", letto), re.sub(r"\s", "", iban_vero)
+    # Tutti i pezzi lunghi quanto l'IBAN, con fino a tre caratteri in più o in meno.
     pezzi = [
         compatto[inizio : inizio + lunghezza]
         for lunghezza in range(len(cercato) - 3, len(cercato) + 4)
         for inizio in range(max(1, len(compatto) - lunghezza + 1))
     ]
-    return min(pezzi, key=lambda pezzo: (_distanza(pezzo, cercato), abs(len(pezzo) - len(cercato))))
+    return min(pezzi, key=lambda pezzo: (_distanza_di_levenshtein(pezzo, cercato), abs(len(pezzo) - len(cercato))))
 
 
-def riga_letta(righe: list[list[Parola]], inizio: str) -> str:
+def riga_che_inizia_con(righe: list[list[Parola]], inizio: str) -> str:
     """La riga letta che comincia con `inizio`, per esempio la data di un movimento; se non c'è, tutto il testo."""
-    return next((riga for riga in testo(righe).splitlines() if riga.startswith(inizio)), testo(righe))
+    testo = testo_letto(righe)
+    return next((riga for riga in testo.splitlines() if riga.startswith(inizio)), testo)
 
 
-def differenze(letto: str, vero: str) -> int:
-    """Quanti caratteri cambiare, aggiungere o togliere: 0 vuol dire corrispondenza esatta."""
-    return _distanza(re.sub(r"\s", "", letto), re.sub(r"\s", "", vero))
+def caratteri_da_correggere(letto: str, vero: str) -> int:
+    """Quanti caratteri cambiare, aggiungere o togliere, spazi esclusi: 0 vuol dire corrispondenza esatta."""
+    return _distanza_di_levenshtein(re.sub(r"\s", "", letto), re.sub(r"\s", "", vero))
 
 
 def iban_vero(numero_riga: int) -> str:
-    """L'IBAN scritto in una riga di DOC-05, l'estratto conto del fascicolo."""
+    """L'IBAN scritto in una riga del CSV di DOC-05, l'estratto conto del fascicolo (la riga 1 è l'intestazione)."""
     riga = (FASCICOLO / "core" / "DOC-05-estratto-conto.csv").read_text(encoding="utf-8").splitlines()[numero_riga - 1]
     return next(csv.reader([riga]))[3]
 
 
-def incerti(righe: list[list[Parola]], soglia: float = SOGLIA_INCERTO) -> list[tuple[str, str, float]]:
+def caratteri_incerti(righe: list[list[Parola]], soglia: float = SOGLIA_INCERTO) -> list[tuple[str, str, float]]:
     """I caratteri sotto la soglia: (parola, carattere, confidenza). Sono quelli da far controllare a una persona."""
     return [
         (parola.testo, carattere, round(confidenza, 2))
@@ -324,36 +355,39 @@ def incerti(righe: list[list[Parola]], soglia: float = SOGLIA_INCERTO) -> list[t
 # Parte 4: ricerca per immagini
 
 
-class Ricerca:
+class RicercaPerImmagini:
     """Testo e immagini nello stesso spazio: una frase trova i fotogrammi con i vettori più vicini."""
 
     def __init__(self) -> None:
         from transformers import AutoModel, AutoProcessor
 
-        self.preparatore = _carica(AutoProcessor, RICERCA)
-        self.modello = _carica(AutoModel, RICERCA).eval()
+        self.preparatore = _carica_modello(AutoProcessor, RICERCA)
+        self.modello = _carica_modello(AutoModel, RICERCA).eval()
         self.file: list[str] = []
         self.vettori = torch.empty(0)
 
     def indicizza(self, file: list[str]) -> torch.Tensor:
+        """Trasforma ogni fotogramma in un vettore di lunghezza 1 e li tiene per le ricerche."""
         with torch.inference_mode():
             vettori = self.modello.get_image_features(
-                **self.preparatore(images=[apri(nome) for nome in file], return_tensors="pt")
+                **self.preparatore(images=[apri_immagine(nome) for nome in file], return_tensors="pt")
             )
-        self.file, self.vettori = list(file), torch.nn.functional.normalize(_tensore(vettori), dim=-1)
+        self.file, self.vettori = list(file), torch.nn.functional.normalize(_come_tensore(vettori), dim=-1)
         return self.vettori
 
     def cerca(self, frase: str, k: int = 5) -> list[tuple[str, float]]:
+        """I `k` fotogrammi più vicini alla frase, dal più vicino: (file, somiglianza del coseno)."""
         with torch.inference_mode():
             vettore = self.modello.get_text_features(
                 **self.preparatore(text=[frase.lower()], padding="max_length", max_length=64, return_tensors="pt")
             )
-        somiglianze = (self.vettori @ torch.nn.functional.normalize(_tensore(vettore), dim=-1).T).squeeze(1)
+        # Tra vettori di lunghezza 1, il prodotto scalare è la somiglianza del coseno.
+        somiglianze = (self.vettori @ torch.nn.functional.normalize(_come_tensore(vettore), dim=-1).T).squeeze(1)
         primi = somiglianze.argsort(descending=True)[:k]
         return [(self.file[i], round(float(somiglianze[i]), 3)) for i in primi]
 
 
-def _tensore(uscita) -> torch.Tensor:
+def _come_tensore(uscita) -> torch.Tensor:
     """Alcune versioni di transformers restituiscono il vettore dentro un oggetto, altre il vettore e basta."""
     return uscita if isinstance(uscita, torch.Tensor) else uscita.pooler_output
 
@@ -361,24 +395,28 @@ def _tensore(uscita) -> torch.Tensor:
 # Parte 5: VLM
 
 
-def targhe() -> list[dict]:
+def targhe_di_fantasia() -> list[dict]:
     """Le tre foto con la targa di fantasia: il file, la targa vera e il suo riquadro in pixel."""
     return [
-        {"file": riga["file"], "targa": riga["targa"], "riquadro": _riquadro(riga)} for riga in _leggi_csv("targhe.csv")
+        {"file": riga["file"], "targa": riga["targa"], "riquadro": _riquadro_dalla_riga(riga)}
+        for riga in _leggi_csv("targhe.csv")
     ]
 
 
-def ritaglio(file: str, riquadro: Riquadro, margine: float = 1.0) -> Image.Image:
-    """Il pezzo di foto intorno al riquadro, alla risoluzione piena: niente viene rimpicciolito."""
+def ritaglia_intorno(file: str, riquadro: Riquadro, margine: float = 1.0) -> Image.Image:
+    """Il pezzo di foto intorno al riquadro, alla risoluzione piena: niente viene rimpicciolito.
+
+    `margine` è lo spazio aggiunto su ogni lato, in multipli della larghezza e dell'altezza del riquadro.
+    """
     x0, y0, x1, y1 = riquadro
     dx, dy = (x1 - x0) * margine, (y1 - y0) * margine
-    immagine = apri(file)
+    immagine = apri_immagine(file)
     larghezza, altezza = immagine.size
     sinistra, alto = max(0, int(x0 - dx)), max(0, int(y0 - dy))
     return immagine.crop((sinistra, alto, min(larghezza, int(x1 + dx)), min(altezza, int(y1 + dy))))
 
 
-class ModelloVisivo:
+class ModelloVisivoLinguistico:
     """Un modello visivo-linguistico (VLM) piccolo: un'immagine e una domanda, una risposta in parole.
 
     L'immagine intera viene rimpicciolita a 512 pixel sul lato lungo prima di entrare nel modello: è ciò che fanno
@@ -388,22 +426,29 @@ class ModelloVisivo:
     def __init__(self) -> None:
         from transformers import AutoModelForImageTextToText, AutoProcessor
 
-        self.preparatore = _carica(AutoProcessor, VLM)
-        self.modello = _carica(AutoModelForImageTextToText, VLM, dtype=torch.float32).eval()
+        self.preparatore = _carica_modello(AutoProcessor, VLM)
+        self.modello = _carica_modello(AutoModelForImageTextToText, VLM, dtype=torch.float32).eval()
 
     def chiedi(self, immagine: Image.Image, domanda: str) -> str:
+        """La risposta del modello alla domanda sull'immagine, al massimo 24 token, sempre la stessa."""
         messaggi = [{"role": "user", "content": [{"type": "image"}, {"type": "text", "text": domanda}]}]
         prompt = self.preparatore.apply_chat_template(messaggi, add_generation_prompt=True)
+        # Senza suddivisione l'immagine entra intera, rimpicciolita: una targa lontana resta di pochi pixel.
         ingresso = self.preparatore(text=prompt, images=[immagine], return_tensors="pt", do_image_splitting=False)
         with torch.inference_mode():
             uscita = self.modello.generate(**ingresso, max_new_tokens=24, do_sample=False)
-        risposta = uscita[:, ingresso["input_ids"].shape[1] :]
+        risposta = uscita[:, ingresso["input_ids"].shape[1] :]  # solo i token nuovi, senza la domanda
         return self.preparatore.batch_decode(risposta, skip_special_tokens=True)[0].strip()
 
 
 def scarica_modelli() -> None:
     """Scarica i quattro modelli in `.modelli/` (2,1 GB), così in aula non serve la rete."""
-    modelli = {"rilevamento": ModelloDiRilevamento, "OCR": Lettore, "ricerca": Ricerca, "VLM": ModelloVisivo}
+    modelli = {
+        "rilevamento": ModelloDiRilevamento,
+        "OCR": LettoreOCR,
+        "ricerca": RicercaPerImmagini,
+        "VLM": ModelloVisivoLinguistico,
+    }
     for nome, classe in modelli.items():
         classe()
         print(f"{nome}: pronto")

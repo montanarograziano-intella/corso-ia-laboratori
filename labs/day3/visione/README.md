@@ -1,6 +1,6 @@
 # Notebook di computer vision: un test set
 
-Giorno 3, mattina, slide 47-48. 45 minuti, ognuno al proprio portatile, poi il confronto.
+Giorno 3, mattina, slide 43a. Ognuno al proprio portatile.
 
 Cinque modelli di visione su un piccolo test set, ognuno con la sua misura: rilevamento di veicoli a tre soglie, la
 recall di giorno e di notte, l'OCR su tre scansioni e un IBAN scritto a mano, la ricerca di fotogrammi con una frase,
@@ -29,7 +29,7 @@ Non gira sui Mac con processore Intel: PyTorch non pubblica più versioni per qu
 
 | File | Che cos'è |
 |---|---|
-| `notebook.ipynb` | Il notebook, in sei parti: rilevamento, gruppi, OCR, ricerca per immagini, VLM, tabella |
+| `notebook.ipynb` | Il notebook, in cinque parti: rilevamento, gruppi, OCR, ricerca per immagini, VLM; ogni domanda ha la sua risposta |
 | `visione.py` | I dati, i quattro modelli e le misure |
 | `dati/fotogrammi/` | 29 foto di strade e parcheggi: 24 di giorno, 5 di notte o al crepuscolo |
 | `dati/veicoli.csv` | I riquadri veri di auto, camion e autobus, uno per riga |
