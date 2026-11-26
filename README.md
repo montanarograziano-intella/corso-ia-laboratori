@@ -13,10 +13,9 @@ esistono. I domini finiscono in `.invalid` e gli indirizzi IP sono quelli riserv
 | `labs/day1/agent-lab/` | 1, pomeriggio | L'agente a mano: voi fate gli strumenti, il modello chiede; si apre `index.html` |
 | `labs/day1/agent-demo/visore/` | 1, pomeriggio | La demo dell'agente, da sfogliare nel browser: si apre `index.html` |
 | `labs/day3/visione/` | 3, mattina | Un notebook: cinque modelli di visione misurati su un piccolo test set |
-| `labs/day3/rag/` | 3, pomeriggio | Un notebook: tre modi di cercare nel fascicolo, e le risposte con la fonte |
+| `labs/day3/rag/` | 4, mattina | Un notebook: tre modi di cercare nel fascicolo, e le risposte con la fonte |
 | `labs/day3/fine-tuning/` | 3, pomeriggio | Un esempio da leggere: un modello piccolo adattato a compilare una scheda |
-| `labs/day4/agent-lab/` | 4, mattina | Un agente che lavora su un fascicolo, con controlli e traccia |
-| `labs/day4/local-models-lab/` | 4, pomeriggio | Modelli piccoli sul proprio portatile, messi a confronto |
+| `labs/day4/agent-lab/` | 4 | Un notebook: un agente sul fascicolo, su un modello locale, con controlli e traccia |
 | `data/case-file/` | 1, 3, 4 e 5 | Il fascicolo: dieci documenti, un undicesimo in HTML, la foto di un IBAN |
 
 Ogni laboratorio ha il suo `README.md`, con i comandi da eseguire. Si parte da lì.

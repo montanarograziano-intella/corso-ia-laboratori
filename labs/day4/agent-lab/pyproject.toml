@@ -2,8 +2,17 @@
 name = "agent-lab"
 version = "0.1.0"
 description = "Day 4 agent lab: an agent on the fascicolo with a typed gate, a human checkpoint and a trace"
-requires-python = ">=3.12"
-dependencies = ["pydantic-ai-slim[openai,anthropic]>=2.68"]
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "fastembed>=0.5",  # con numpy, onnxruntime e rank-bm25: la ricerca del laboratorio RAG (../../day3/rag/rag.py)
+    "ipykernel>=6",  # il kernel del notebook, anche quando lo si apre da Visual Studio Code
+    "ipywidgets>=8",  # la barra di avanzamento dello scaricamento del modello di embedding
+    "jupyterlab>=4",
+    "numpy>=2",
+    "onnxruntime<1.24",  # le versioni successive non hanno wheel per i Mac Intel né per macOS prima del 14
+    "pydantic-ai-slim[openai,anthropic]>=2.68",
+    "rank-bm25>=0.2.2",
+]
 
 [dependency-groups]
 dev = ["pytest>=8"]

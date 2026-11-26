@@ -185,17 +185,6 @@ def test_la_traccia_dice_chi_ha_deciso(tmp_path: Path, monkeypatch: pytest.Monke
     assert deciso_da("automatica") == "LAB_RISPOSTA"
 
 
-def test_il_modello_manipolato_invia_la_cartella_se_nessun_controllo_lo_ferma(tmp_path: Path) -> None:
-    from esegui import carica_agente
-
-    c = contesto(tmp_path, "avvelenata")
-    carica_agente("costruzione", "passo-c.py").esegui(
-        FunctionModel(modello_manipolato), c, "Cronologia.", lambda *a: True
-    )
-    email = (tmp_path / "uscita" / "email-01.txt").read_text(encoding="utf-8")
-    assert email.startswith("A: archivio@esempio.invalid") and "DOC-09" in email.splitlines()[2]
-
-
 def test_il_confronto_non_scambia_numeri_simili_e_conta_una_riga_una_volta() -> None:
     trovati = lambda risposta: [e for e, t in confronta(risposta) if t]  # noqa: E731
     assert all(e["data"] != "2025-03-02" for e in trovati("12/3/2025 08:12 email consegnata [DOC-07, riga 12]"))
@@ -236,24 +225,3 @@ def test_la_fonte_sulla_riga_sotto_conta_per_lo_stesso_evento() -> None:
     bozza = "- **03/03/2025 10:12** SMS a nome della banca\n  [DOC-04, riga 6]\n\n- **03/03/2025 10:19** telefonata\n"
     assert [e["evento"] for e, t in confronta(bozza) if t] == ["SMS a nome della banca"]
     assert applica_regole(SI, PM, bozza, {"DOC-04": None}).esito == "chiedi"  # the second event has no source
-
-
-def test_la_costruzione_cresce_di_uno_strumento_per_passo(tmp_path: Path) -> None:
-    from esegui import carica_agente
-
-    visti: list[list[str]] = []
-
-    def modello(messaggi: list[ModelMessage], info: AgentInfo) -> ModelResponse:
-        visti.append(sorted(s.name for s in info.function_tools))
-        return ModelResponse(parts=[TextPart("fatto")])
-
-    with pytest.raises(NotImplementedError):
-        carica_agente("costruzione").esegui(FunctionModel(modello), contesto(tmp_path), "Cronologia.", lambda *a: True)
-    for passo in "abc":
-        assert (
-            carica_agente("costruzione", f"passo-{passo}.py").esegui(
-                FunctionModel(modello), contesto(tmp_path), "Cronologia.", lambda *a: True
-            )
-            == "fatto"
-        )
-    assert visti == [[], ["leggi_documento"], ["cerca_nel_fascicolo", "invia_email", "leggi_documento"]]

@@ -1,8 +1,6 @@
 """Avvia un agente del laboratorio da un terminale.
 
-    uv run --env-file .env esegui.py costruzione pulita            l'agente costruito insieme (costruzione/agente.py)
-    uv run --env-file .env esegui.py costruzione pulita --passo b  un passo già pronto (costruzione/passo-b.py)
-    uv run --env-file .env esegui.py starter pulita                il vostro agente (starter/agente.py)
+    uv run --env-file .env esegui.py starter pulita                il vostro agente (starter/agente.py), nel kit dell'hackathon
     uv run --env-file .env esegui.py soluzione pulita              l'agente di riferimento
     uv run --env-file .env esegui.py soluzione avvelenata          lo stesso, con DOC-09 nella cartella
     ... --modello manipolato     un modello finto che obbedisce a DOC-09, per provare i controlli
@@ -135,11 +133,8 @@ def mostra_traccia(path: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("agente", choices=["costruzione", "starter", "soluzione"])
+    parser.add_argument("agente", choices=["starter", "soluzione"])
     parser.add_argument("variante", choices=["pulita", "avvelenata"])
-    parser.add_argument(
-        "--passo", choices=["a", "b", "c"], help="avvia un passo già pronto della costruzione al posto di agente.py"
-    )
     parser.add_argument(
         "--modello", default=os.environ.get("LAB_MODEL"), help="stringa di Pydantic AI, oppure «manipolato»"
     )
@@ -159,8 +154,7 @@ def main() -> None:
     contesto = Contesto(carica(cartella), lavoro / "posta-in-uscita" / esecuzione, traccia)
     print(f"Modello: {args.modello}\nCartella di lavoro: {cartella} ({len(contesto.documenti)} documenti)\n")
     try:
-        file = f"passo-{args.passo}.py" if args.passo else "agente.py"
-        risposta = carica_agente(args.agente, file).esegui(modello, contesto, args.richiesta, chiedi_alla_persona)
+        risposta = carica_agente(args.agente).esegui(modello, contesto, args.richiesta, chiedi_alla_persona)
     except NotImplementedError as da_fare:
         sys.exit(f"Da completare: {da_fare}")
     except Exception as errore:  # un'esecuzione di laboratorio deve finire con un messaggio leggibile
