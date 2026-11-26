@@ -41,8 +41,8 @@ Poi **chiudere e riaprire il terminale**. Controllo: `uv --version`.
 
 ### 4. La cartella del corso
 
-Chi l'ha già: entrarci e scrivere `git pull`. Chi non l'ha: clonarla con il comando della pagina del repository,
-oppure scaricare lo ZIP da «Code», «Download ZIP» e scompattarlo.
+Git non è necessario. Chi non ha la cartella: dalla pagina del repository, «Code», «Download ZIP», e scompattare lo
+ZIP. Chi usa git: clonarla con il comando della stessa pagina, oppure `git pull` se la cartella c'è già.
 
 ### 5. Le librerie del laboratorio
 
@@ -55,6 +55,17 @@ uv sync
 
 `uv sync` crea in questa cartella una cartella `.venv` con Python e le librerie. La prima volta scarica circa
 400 MB.
+
+### 6. Il modello di embedding per la ricerca
+
+La ricerca nel fascicolo usa un modello di embedding di circa 1 GB, che si scarica una volta sola. Conviene farlo
+prima del laboratorio, con la rete buona, dalla stessa cartella:
+
+```sh
+uv run python -c "import laboratorio as lab; print(lab.cerca_nel_fascicolo(lab.Fascicolo(lab.Impostazioni()), 'bonifico')[:80])"
+```
+
+Quando stampa una riga di testo del fascicolo, il modello è sul disco. Per questo passaggio Ollama non serve.
 
 ## Aprire un notebook
 

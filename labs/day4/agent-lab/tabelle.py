@@ -17,6 +17,8 @@ SFONDO = {
     GIALLO: "rgba(191,135,0,.16)",
     GRIGIO: "rgba(140,149,159,.14)",
 }
+# Le targhette hanno testo bianco su un fondo pieno e più scuro: si leggono su sfondo chiaro e su sfondo scuro.
+PIENO = {VERDE: "#1a7f37", ROSSO: "#cf222e", GIALLO: "#9a6700", GRIGIO: "#6e7781"}
 CELLA = "padding:6px 12px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(140,149,159,.3)"
 
 
@@ -45,7 +47,7 @@ def nome(valore: object) -> str:
 
 def etichetta(scritta: str, colore: str) -> str:
     """Una piccola targhetta colorata, per esempio «✓ corretto»."""
-    stile = f"display:inline-block;padding:1px 9px;border-radius:10px;font-weight:600;color:{colore};background:{SFONDO[colore]};white-space:nowrap"
+    stile = f"display:inline-block;padding:1px 9px;border-radius:10px;font-weight:600;color:#fff;background:{PIENO[colore]};white-space:nowrap"
     return f'<span style="{stile}">{testo(scritta)}</span>'
 
 
@@ -90,6 +92,40 @@ def tabella(intestazioni: list[str], righe: list[list[str]], numeri: tuple[int, 
     testa = "".join(cella("th", testo(i), n) for n, i in enumerate(intestazioni))
     corpo = "".join("<tr>" + "".join(cella("td", c, n) for n, c in enumerate(riga)) + "</tr>" for riga in righe)
     return f'<table style="border-collapse:collapse;margin:6px 0"><thead><tr>{testa}</tr></thead><tbody>{corpo}</tbody></table>'
+
+
+class Avanzamento:
+    """Una tabella che cresce una riga alla volta mentre la prova gira. In un terminale stampa una riga di testo."""
+
+    def __init__(self, intestazioni: list[str], numeri: tuple[int, ...] = ()) -> None:
+        self.intestazioni, self.numeri, self.righe, self.schermo = intestazioni, numeri, [], None
+        if in_un_notebook():
+            from IPython.display import HTML, display
+
+            self.schermo = display(HTML(""), display_id=True)
+
+    def _disegna(self, html: str) -> None:
+        from IPython.display import HTML
+
+        self.schermo.update(HTML(html))
+
+    def riga(self, celle_html: list[str], alternativa: str) -> None:
+        if self.schermo is None:
+            print(alternativa)
+            return
+        self.righe.append(celle_html)
+        self._disegna(tabella(self.intestazioni, self.righe, self.numeri))
+
+    def chiudi(self, html: str, alternativa: str) -> None:
+        """Alla fine la tabella lascia il posto a una riga di riepilogo: il dettaglio lo mostra `tabella()`."""
+        if self.schermo is None:
+            print(alternativa)
+        else:
+            self._disegna(html)
+
+
+def avviso(frase: str, colore: str = GIALLO) -> None:
+    mostra(riquadro(testo(frase), "", colore), frase)
 
 
 def riquadro(titolo_html: str, corpo_html: str, colore: str = GRIGIO) -> str:
