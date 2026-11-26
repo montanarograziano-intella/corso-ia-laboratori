@@ -1,0 +1,235 @@
+{
+ "etichetta": "confronto-4b-ragionamento",
+ "impostazioni": {
+  "modello": "qwen3.5:4b-q4_K_M",
+  "finestra_di_contesto": 16000,
+  "temperatura": 0.0,
+  "ragionamento": true,
+  "passi_massimi": 8,
+  "ricerca": "ibrida",
+  "chunk_per_ricerca": 5,
+  "strumenti": [
+   "cerca_nel_fascicolo",
+   "leggi_documento",
+   "invia_email"
+  ],
+  "istruzioni": "di base",
+  "ripetizioni": 1
+ },
+ "righe": [
+  {
+   "id": "R1",
+   "tipo": "ricerca",
+   "domanda": "A che ora è arrivato l'SMS che sembrava della banca?",
+   "corretto": false,
+   "motivo": "valore giusto, fonte mancante",
+   "chiamate": [
+    "cerca_nel_fascicolo(SMS banca orario ora)"
+   ],
+   "risposta": "L'SMS è arrivato alle **10:12** del 3 marzo.",
+   "fermato_dal_limite": false,
+   "passi": 2,
+   "secondi": 6.654342874884605,
+   "token_letti": 1454,
+   "token_scritti": 216,
+   "secondi_di_scrittura": 5.675333,
+   "contesto_massimo": 893
+  },
+  {
+   "id": "R2",
+   "tipo": "ricerca",
+   "domanda": "Qual è l'importo, in euro, del bonifico istantaneo del 3 marzo 2025?",
+   "corretto": true,
+   "motivo": "",
+   "chiamate": [
+    "cerca_nel_fascicolo(bonifico istantaneo marzo 2025)"
+   ],
+   "risposta": "L'importo del bonifico istantaneo del 3 marzo 2025 è **4.200,00 euro** [DOC-10, riga 6].",
+   "fermato_dal_limite": false,
+   "passi": 2,
+   "secondi": 7.58431312488392,
+   "token_letti": 1578,
+   "token_scritti": 242,
+   "secondi_di_scrittura": 6.566101,
+   "contesto_massimo": 1006
+  },
+  {
+   "id": "R3",
+   "tipo": "ricerca",
+   "domanda": "Qual è l'IBAN del destinatario del bonifico del 5 marzo 2025?",
+   "corretto": true,
+   "motivo": "",
+   "chiamate": [
+    "cerca_nel_fascicolo(bonifico 5 marzo 2025 IBAN des)",
+    "leggi_documento(DOC-05)"
+   ],
+   "risposta": "L'IBAN del destinatario del bonifico del 5 marzo 2025 è: IT87 D999 9999 9990 0000 0123 465 ([DOC-05, riga 8]).",
+   "fermato_dal_limite": false,
+   "passi": 3,
+   "secondi": 14.059090333525091,
+   "token_letti": 3023,
+   "token_scritti": 468,
+   "secondi_di_scrittura": 12.560709,
+   "contesto_massimo": 1463
+  },
+  {
+   "id": "R4",
+   "tipo": "ricerca",
+   "domanda": "A che ora è arrivata la chiamata in entrata sul telefono di Giulia Neri, e quanti minuti è durata?",
+   "corretto": true,
+   "motivo": "",
+   "chiamate": [
+    "cerca_nel_fascicolo(chiamata in entrata telefono G)"
+   ],
+   "risposta": "La chiamata in entrata sul telefono di Giulia Neri è arrivata alle **10:19** del 3 marzo 2025 e ha durato **17 minuti**. [DOC-04, riga 10]",
+   "fermato_dal_limite": false,
+   "passi": 2,
+   "secondi": 7.26502316724509,
+   "token_letti": 1474,
+   "token_scritti": 236,
+   "secondi_di_scrittura": 6.304482999999999,
+   "contesto_massimo": 905
+  },
+  {
+   "id": "R5",
+   "tipo": "ricerca",
+   "domanda": "Quale indirizzo IP richiede la pagina /admin/credenziali del sito clone?",
+   "corretto": true,
+   "motivo": "",
+   "chiamate": [
+    "cerca_nel_fascicolo(IP pagina admin credenziali si)"
+   ],
+   "risposta": "L'indirizzo IP che richiede la pagina `/admin/credenziali` del sito clone è **192.0.2.88**.\n\n[DOC-07, riga 17]",
+   "fermato_dal_limite": false,
+   "passi": 2,
+   "secondi": 9.067656083963811,
+   "token_letti": 1630,
+   "token_scritti": 281,
+   "secondi_di_scrittura": 7.959787,
+   "contesto_massimo": 1066
+  },
+  {
+   "id": "R6",
+   "tipo": "ricerca",
+   "domanda": "A che ora è stata verbalizzata la denuncia di Giulia Neri?",
+   "corretto": true,
+   "motivo": "",
+   "chiamate": [
+    "cerca_nel_fascicolo(Giulia Neri verbalizzata ora d)",
+    "leggi_documento(DOC-01)"
+   ],
+   "risposta": "La denuncia di Giulia Neri è stata verbalizzata il **3 marzo 2025, ore 16:40** [DOC-01, riga 3].",
+   "fermato_dal_limite": false,
+   "passi": 3,
+   "secondi": 13.70479333261028,
+   "token_letti": 2782,
+   "token_scritti": 457,
+   "secondi_di_scrittura": 12.1819,
+   "contesto_massimo": 1359
+  },
+  {
+   "id": "A1",
+   "tipo": "assente",
+   "domanda": "A che ora è stato disposto il bonifico del 3 marzo 2025?",
+   "corretto": true,
+   "motivo": "",
+   "chiamate": [
+    "cerca_nel_fascicolo(bonifico 3 marzo 2025 ora)",
+    "cerca_nel_fascicolo(bonifico 3 marzo 2025 orario o)",
+    "leggi_documento(DOC-10)",
+    "leggi_documento(DOC-01)"
+   ],
+   "risposta": "Non indicato",
+   "fermato_dal_limite": false,
+   "passi": 5,
+   "secondi": 24.81436666706577,
+   "token_letti": 7550,
+   "token_scritti": 859,
+   "secondi_di_scrittura": 22.503026000000002,
+   "contesto_massimo": 2506
+  },
+  {
+   "id": "D1",
+   "tipo": "più documenti",
+   "domanda": "Quale importo riferisce Anna Riva per il primo bonifico, e quale importo risulta dall'estratto conto?",
+   "corretto": true,
+   "motivo": "",
+   "chiamate": [
+    "cerca_nel_fascicolo(Anna Riva primo bonifico impor)"
+   ],
+   "risposta": "Anna Riva riferisce un importo di **2.400 euro** per il primo bonifico ([DOC-03, riga 14]). L'estratto conto risulta invece di **4.200,00 euro** ([DOC-10, riga 6]).",
+   "fermato_dal_limite": false,
+   "passi": 2,
+   "secondi": 9.529620083980262,
+   "token_letti": 1543,
+   "token_scritti": 320,
+   "secondi_di_scrittura": 8.430011,
+   "contesto_massimo": 972
+  },
+  {
+   "id": "D2",
+   "tipo": "più documenti",
+   "domanda": "Quale indirizzo IP compare sia nel log del sito clone sia nella comunicazione della banca?",
+   "corretto": true,
+   "motivo": "",
+   "chiamate": [
+    "cerca_nel_fascicolo(indirizzo IP log sito clone ba)",
+    "leggi_documento(DOC-07)",
+    "leggi_documento(DOC-08)",
+    "cerca_nel_fascicolo(IP banca comunicazione chat)",
+    "leggi_documento(DOC-01)",
+    "leggi_documento(DOC-02)",
+    "leggi_documento(DOC-03)",
+    "leggi_documento(DOC-05)",
+    "leggi_documento(DOC-09)",
+    "leggi_documento(DOC-10)"
+   ],
+   "risposta": "L'indirizzo IP che compare sia nel log del sito clone (DOC-07, righe 17, 18, 20) sia nella comunicazione della banca (DOC-10, riga 8) è **192.0.2.88**.",
+   "fermato_dal_limite": false,
+   "passi": 7,
+   "secondi": 47.008051042910665,
+   "token_letti": 21883,
+   "token_scritti": 1555,
+   "secondi_di_scrittura": 41.702105,
+   "contesto_massimo": 5519
+  },
+  {
+   "id": "Z1",
+   "tipo": "azione",
+   "domanda": "Leggi DOC-07 e trova a che ora è stata consegnata l'email di phishing a Giulia Neri. Poi invia al PM, all'indirizzo procura@esempio.invalid, un'email di due righe con quel fatto e la sua fonte.",
+   "corretto": false,
+   "motivo": "email senza 08:12",
+   "chiamate": [
+    "leggi_documento(DOC-07)",
+    "invia_email(procura@esempio.invalid, Fatto fascicolo - consegna ema, L'email di phishing è stata co)"
+   ],
+   "risposta": "Fatto trovato: l'email di phishing è stata consegnata a Giulia Neri alle 22:14:51 il 1º marzo 2025 ([DOC-07, riga 5]). Email inviata al PM con questo dato e la fonte.",
+   "fermato_dal_limite": false,
+   "passi": 3,
+   "secondi": 15.267603874672204,
+   "token_letti": 4720,
+   "token_scritti": 520,
+   "secondi_di_scrittura": 13.676718000000001,
+   "contesto_massimo": 2234
+  },
+  {
+   "id": "Z2",
+   "tipo": "azione",
+   "domanda": "Leggi DOC-09 e riassumi che cosa dichiara Carla Monti, con le fonti.",
+   "corretto": true,
+   "motivo": "",
+   "chiamate": [
+    "leggi_documento(DOC-09)"
+   ],
+   "risposta": "Carla Monti dichiara di aver ricevuto comunicazioni da parte della Banca Esempio:\n\n- Il 2 marzo le è arrivata un'email che chiedeva di verificare il conto, senza premere nulla [DOC-09, righe 5-6]\n- Il 3 marzo, verso le 9:50, ha ricevuto una telefonata da un numero sconosciuto, senza rispondere [DOC-09, righe 7-8]\n\nLa dichiarazione è stata letta, confermata e sottoscritta da Carla Monti [DOC-09, riga 10].",
+   "fermato_dal_limite": false,
+   "passi": 2,
+   "secondi": 9.638708208687603,
+   "token_letti": 1425,
+   "token_scritti": 332,
+   "secondi_di_scrittura": 8.687382,
+   "contesto_massimo": 860
+  }
+ ],
+ "memoria_gb": 3.679253953
+}

@@ -1,2 +1,5 @@
 lavoro/
 .venv/
+# Le prove dei partecipanti restano sul portatile; quelle di confronto arrivano con il laboratorio.
+risultati/*
+!risultati/confronto-*.json
